@@ -1,0 +1,599 @@
+/* 游戏界面样式 */
+
+/* 房间界面 */
+.room-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: var(--bg-medium);
+    border-bottom: 2px solid var(--bg-light);
+}
+
+.room-info {
+    text-align: center;
+}
+
+#room-title {
+    font-size: 20px;
+    font-weight: bold;
+    display: block;
+}
+
+#room-id-display {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.room-main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+/* 座位布局 */
+.seats-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.seats-middle {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.seat {
+    width: 150px;
+    height: 150px;
+    background: var(--bg-medium);
+    border: 3px solid var(--bg-light);
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.seat.occupied {
+    border-color: var(--secondary-color);
+}
+
+.seat.ready {
+    border-color: var(--accent-color);
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.seat.host {
+    border-color: var(--primary-color);
+}
+
+.seat-self {
+    border-color: var(--primary-color);
+    background: rgba(229, 57, 53, 0.1);
+}
+
+.seat-content {
+    text-align: center;
+}
+
+.seat-avatar {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.seat-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.seat-status {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.seat-status.ready {
+    color: var(--accent-color);
+}
+
+.room-center {
+    width: 100px;
+    height: 100px;
+    background: var(--bg-light);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+}
+
+/* 房间操作 */
+.room-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* 聊天区域 */
+.room-chat {
+    background: var(--bg-medium);
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.chat-messages {
+    height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+    background: var(--bg-dark);
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.chat-message {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    background: var(--bg-light);
+    border-radius: 8px;
+}
+
+.chat-message .sender {
+    color: var(--accent-color);
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.chat-message .time {
+    color: var(--text-secondary);
+    font-size: 12px;
+    float: right;
+}
+
+.chat-message.system {
+    background: rgba(229, 57, 53, 0.2);
+    text-align: center;
+    font-style: italic;
+}
+
+.chat-input {
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid var(--bg-light);
+    border-radius: 8px;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+}
+
+/* 游戏界面 */
+.game-container {
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(ellipse at center, #1a472a 0%, #0d2818 100%);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 玩家区域 */
+.player-area {
+    padding: 10px;
+}
+
+.player-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.player-left,
+.player-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 120px;
+}
+
+.player-bottom {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 20px;
+    gap: 10px;
+}
+
+.player-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    margin-bottom: 10px;
+    min-width: 150px;
+}
+
+.player-name {
+    font-weight: bold;
+    color: white;
+}
+
+.player-score {
+    color: var(--accent-color);
+}
+
+/* 游戏中间区域 */
+.game-middle {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    padding: 0 20px;
+}
+
+.game-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.center-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+}
+
+#wind-indicator {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+#tiles-remaining {
+    color: white;
+}
+
+#dora-indicators {
+    display: flex;
+    gap: 5px;
+}
+
+/* 回合指示器 */
+.turn-indicator {
+    position: absolute;
+    padding: 10px 20px;
+    background: var(--primary-color);
+    border-radius: 20px;
+    font-weight: bold;
+    animation: turnPulse 1s infinite;
+}
+
+@keyframes turnPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.turn-indicator.top { top: 20px; left: 50%; transform: translateX(-50%); }
+.turn-indicator.left { left: 20px; top: 50%; transform: translateY(-50%); }
+.turn-indicator.right { right: 20px; top: 50%; transform: translateY(-50%); }
+.turn-indicator.bottom { bottom: 150px; left: 50%; transform: translateX(-50%); }
+
+/* 动作计时器 */
+.action-timer {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+    font-weight: bold;
+    color: white;
+    margin-top: 20px;
+}
+
+.action-timer.warning {
+    color: var(--warning-color);
+    animation: timerWarning 0.5s infinite;
+}
+
+.action-timer.danger {
+    color: var(--error-color);
+    animation: timerWarning 0.25s infinite;
+}
+
+@keyframes timerWarning {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* 动作按钮 */
+.action-buttons {
+    position: fixed;
+    bottom: 200px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    padding: 15px 25px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 16px;
+    z-index: 100;
+}
+
+.action-btn {
+    padding: 12px 24px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-3px);
+}
+
+#btn-chow {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+}
+
+#btn-pong {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+}
+
+#btn-kong {
+    background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+    color: white;
+}
+
+#btn-mahjong {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    font-size: 20px;
+}
+
+#btn-pass {
+    background: linear-gradient(135deg, #607d8b, #455a64);
+    color: white;
+}
+
+/* 游戏信息栏 */
+.game-info-bar {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+}
+
+.my-info {
+    display: flex;
+    gap: 15px;
+}
+
+#my-name {
+    font-weight: bold;
+    color: white;
+}
+
+#my-score {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* 游戏结果 */
+#result-content {
+    padding: 20px;
+}
+
+.result-winner {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.result-winner .winner-name {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.result-yaku {
+    margin-bottom: 20px;
+}
+
+.result-yaku h4 {
+    margin-bottom: 10px;
+    color: var(--text-secondary);
+}
+
+.yaku-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.yaku-item {
+    padding: 8px 16px;
+    background: var(--bg-light);
+    border-radius: 20px;
+}
+
+.yaku-name {
+    color: var(--accent-color);
+    margin-right: 5px;
+}
+
+.yaku-value {
+    color: white;
+}
+
+.result-scores {
+    margin-top: 20px;
+}
+
+.result-scores h4 {
+    margin-bottom: 10px;
+    color: var(--text-secondary);
+}
+
+.score-list {
+    display: grid;
+    gap: 10px;
+}
+
+.score-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background: var(--bg-light);
+    border-radius: 8px;
+}
+
+.score-item.winner {
+    background: rgba(255, 193, 7, 0.2);
+    border: 1px solid var(--accent-color);
+}
+
+.score-change.positive {
+    color: var(--success-color);
+}
+
+.score-change.negative {
+    color: var(--error-color);
+}
+
+/* 回放界面 */
+.replay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: var(--bg-medium);
+    border-bottom: 2px solid var(--bg-light);
+}
+
+.replay-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.replay-main {
+    height: calc(100vh - 70px);
+    display: flex;
+    flex-direction: column;
+}
+
+.replay-timeline {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 30px;
+    background: var(--bg-medium);
+}
+
+#replay-slider {
+    flex: 1;
+    height: 8px;
+    -webkit-appearance: none;
+    background: var(--bg-light);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#replay-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* 当前玩家指示 */
+.current-turn {
+    position: relative;
+}
+
+.current-turn::before {
+    content: '▶';
+    position: absolute;
+    left: -20px;
+    color: var(--accent-color);
+    animation: arrowBlink 0.5s infinite;
+}
+
+@keyframes arrowBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .my-hand .tile {
+        width: 40px;
+        height: 56px;
+        font-size: 28px;
+    }
+    
+    .my-drawn-tile .tile {
+        width: 40px;
+        height: 56px;
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-middle {
+        flex-direction: column;
+    }
+    
+    .player-left,
+    .player-right {
+        width: 100%;
+        flex-direction: row;
+    }
+    
+    .my-hand .tile {
+        width: 32px;
+        height: 45px;
+        font-size: 22px;
+    }
+    
+    .action-buttons {
+        bottom: 150px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .action-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}

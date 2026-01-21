@@ -1,0 +1,312 @@
+/* 麻将牌样式 */
+
+.tile {
+    width: 40px;
+    height: 56px;
+    background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
+    border-radius: 6px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1),
+        inset 0 2px 0 rgba(255, 255, 255, 0.8);
+    position: relative;
+    user-select: none;
+}
+
+.tile:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 8px 16px rgba(0, 0, 0, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1),
+        inset 0 2px 0 rgba(255, 255, 255, 0.8);
+}
+
+.tile.selected {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(229, 57, 53, 0.5);
+    border: 2px solid var(--primary-color);
+}
+
+.tile.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tile.disabled:hover {
+    transform: none;
+}
+
+/* 牌背面 */
+.tile-back {
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    color: transparent;
+}
+
+.tile-back::after {
+    content: '🀫';
+    font-size: 24px;
+}
+
+/* 小尺寸牌 */
+.tile-small {
+    width: 28px;
+    height: 40px;
+    font-size: 20px;
+}
+
+/* 横放的牌（吃碰杠） */
+.tile-horizontal {
+    width: 56px;
+    height: 40px;
+}
+
+/* 牌的颜色 */
+.tile-wan .tile-value { color: #d32f2f; }  /* 万 - 红色 */
+.tile-tong .tile-value { color: #1976d2; } /* 筒 - 蓝色 */
+.tile-tiao .tile-value { color: #388e3c; } /* 条 - 绿色 */
+.tile-feng .tile-value { color: #333; }    /* 风 - 黑色 */
+.tile-jian .tile-value { color: #333; }    /* 箭 - 黑色 */
+
+/* 中 */
+.tile-zhong .tile-value {
+    color: #d32f2f;
+}
+
+/* 发 */
+.tile-fa .tile-value {
+    color: #388e3c;
+}
+
+/* 白 */
+.tile-bai .tile-value {
+    color: #1976d2;
+}
+
+/* 牌的内容样式 */
+.tile-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.tile-value {
+    font-weight: bold;
+    line-height: 1;
+}
+
+.tile-suit {
+    font-size: 10px;
+    color: #666;
+}
+
+/* 牌组容器 */
+.hand-tiles {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* 自己的手牌 */
+.my-hand {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+}
+
+.my-hand .tile {
+    width: 50px;
+    height: 70px;
+    font-size: 36px;
+}
+
+.my-hand .tile:hover {
+    transform: translateY(-15px);
+}
+
+/* 摸到的牌 */
+.my-drawn-tile {
+    display: flex;
+    margin-left: 15px;
+    padding: 10px;
+    background: rgba(255, 193, 7, 0.2);
+    border-radius: 12px;
+}
+
+.my-drawn-tile .tile {
+    width: 50px;
+    height: 70px;
+    font-size: 36px;
+    border: 2px solid var(--accent-color);
+}
+
+/* 副露区域 */
+.my-melds {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.meld {
+    display: flex;
+    gap: 2px;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.meld.concealed .tile {
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+}
+
+/* 花牌区域 */
+.my-flowers {
+    display: flex;
+    gap: 5px;
+}
+
+.my-flowers .tile {
+    width: 30px;
+    height: 42px;
+    font-size: 20px;
+}
+
+/* 打出的牌区域 */
+.player-discards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    max-width: 180px;
+    padding: 5px;
+}
+
+.player-discards .tile {
+    width: 24px;
+    height: 34px;
+    font-size: 16px;
+    cursor: default;
+}
+
+.player-discards .tile:hover {
+    transform: none;
+}
+
+.player-discards .tile.last-discard {
+    border: 2px solid var(--accent-color);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.5); }
+    50% { box-shadow: 0 0 0 8px rgba(255, 193, 7, 0); }
+}
+
+/* 其他玩家手牌（背面） */
+.player-hand .hand-tiles {
+    display: flex;
+    gap: 1px;
+}
+
+.player-left .player-hand,
+.player-right .player-hand {
+    writing-mode: vertical-lr;
+}
+
+.player-left .tile,
+.player-right .tile {
+    width: 34px;
+    height: 24px;
+    font-size: 14px;
+}
+
+/* 中央弃牌区域 */
+.center-discards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+
+.center-discard-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    justify-content: center;
+    max-width: 150px;
+}
+
+/* 动画效果 */
+.tile-deal {
+    animation: dealTile 0.3s ease-out;
+}
+
+@keyframes dealTile {
+    from {
+        transform: translateY(-100px) scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.tile-discard {
+    animation: discardTile 0.3s ease-out;
+}
+
+@keyframes discardTile {
+    from {
+        transform: scale(1.2);
+        opacity: 0.5;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* 吃碰杠选择 */
+.chow-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+}
+
+.chow-option {
+    display: flex;
+    gap: 5px;
+    padding: 10px;
+    background: var(--bg-light);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chow-option:hover {
+    background: var(--primary-color);
+}
+
+.chow-option .tile {
+    width: 40px;
+    height: 56px;
+}
+
+/* Unicode麻将牌符号 */
+.tile-unicode {
+    font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+}

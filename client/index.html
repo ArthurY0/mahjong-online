@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🀄 麻将在线 - Mahjong Online</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/tiles.css">
+    <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+    <!-- 加载画面 -->
+    <div id="loading-screen" class="screen active">
+        <div class="loading-content">
+            <h1>🀄 麻将在线</h1>
+            <p>Mahjong Online</p>
+            <div class="loading-spinner"></div>
+            <p id="loading-text">连接服务器中...</p>
+        </div>
+    </div>
+
+    <!-- 登录/注册界面 -->
+    <div id="auth-screen" class="screen">
+        <div class="auth-container">
+            <h1>🀄 麻将在线</h1>
+            
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">登录</button>
+                <button class="tab-btn" data-tab="register">注册</button>
+                <button class="tab-btn" data-tab="guest">游客</button>
+            </div>
+
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="login-username" required minlength="2" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="login-password" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary">登录</button>
+            </form>
+
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="register-username" required minlength="2" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="register-password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>确认密码</label>
+                    <input type="password" id="register-confirm" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary">注册</button>
+            </form>
+
+            <form id="guest-form" class="auth-form">
+                <div class="form-group">
+                    <label>昵称</label>
+                    <input type="text" id="guest-nickname" placeholder="留空则随机生成" maxlength="20">
+                </div>
+                <button type="submit" class="btn btn-secondary">以游客身份进入</button>
+                <p class="hint">游客无法保存游戏记录和排名</p>
+            </form>
+
+            <div id="auth-error" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- 大厅界面 -->
+    <div id="lobby-screen" class="screen">
+        <header class="lobby-header">
+            <div class="logo">🀄 麻将在线</div>
+            <div class="user-info">
+                <span id="user-display"></span>
+                <button id="logout-btn" class="btn btn-small">退出</button>
+            </div>
+        </header>
+
+        <main class="lobby-main">
+            <div class="lobby-stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="online-count">0</span>
+                    <span class="stat-label">在线玩家</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="room-count">0</span>
+                    <span class="stat-label">游戏房间</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="playing-count">0</span>
+                    <span class="stat-label">游戏中</span>
+                </div>
+            </div>
+
+            <div class="lobby-actions">
+                <button id="create-room-btn" class="btn btn-primary btn-large">
+                    ➕ 创建房间
+                </button>
+                <button id="quick-match-btn" class="btn btn-secondary btn-large">
+                    ⚡ 快速匹配
+                </button>
+            </div>
+
+            <div class="lobby-tabs">
+                <button class="tab-btn active" data-tab="rooms">房间列表</button>
+                <button class="tab-btn" data-tab="rankings">排行榜</button>
+                <button class="tab-btn" data-tab="replays">我的回放</button>
+            </div>
+
+            <div id="rooms-tab" class="tab-content active">
+                <div class="room-list-header">
+                    <input type="text" id="room-search" placeholder="搜索房间...">
+                    <select id="room-filter">
+                        <option value="all">全部</option>
+                        <option value="chinese">中国麻将</option>
+                        <option value="japanese">日本麻将</option>
+                    </select>
+                </div>
+                <div id="room-list" class="room-list"></div>
+            </div>
+
+            <div id="rankings-tab" class="tab-content">
+                <table id="rankings-table" class="rankings-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>玩家</th>
+                            <th>积分</th>
+                            <th>胜率</th>
+                            <th>对局</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rankings-body"></tbody>
+                </table>
+            </div>
+
+            <div id="replays-tab" class="tab-content">
+                <div id="replays-list" class="replays-list"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 创建房间模态框 -->
+    <div id="create-room-modal" class="modal">
+        <div class="modal-content">
+            <h2>创建房间</h2>
+            <form id="create-room-form">
+                <div class="form-group">
+                    <label>房间名称</label>
+                    <input type="text" id="room-name" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label>规则</label>
+                    <select id="room-ruleset">
+                        <option value="chinese">中国麻将（国标）</option>
+                        <option value="japanese">日本麻将（立直）</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>房间密码（可选）</label>
+                    <input type="password" id="room-password" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="room-flowers" checked>
+                        包含花牌
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>回合时限</label>
+                    <select id="room-timelimit">
+                        <option value="15">15秒</option>
+                        <option value="30" selected>30秒</option>
+                        <option value="60">60秒</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-create">取消</button>
+                    <button type="submit" class="btn btn-primary">创建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 加入房间密码模态框 -->
+    <div id="join-room-modal" class="modal">
+        <div class="modal-content">
+            <h2>输入房间密码</h2>
+            <form id="join-room-form">
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="join-password" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-join">取消</button>
+                    <button type="submit" class="btn btn-primary">加入</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 房间界面 -->
+    <div id="room-screen" class="screen">
+        <header class="room-header">
+            <button id="leave-room-btn" class="btn btn-small">← 离开房间</button>
+            <div class="room-info">
+                <span id="room-title"></span>
+                <span id="room-id-display"></span>
+            </div>
+            <div class="room-settings">
+                <span id="room-ruleset-display"></span>
+            </div>
+        </header>
+
+        <main class="room-main">
+            <div class="seats-container">
+                <div class="seat" data-seat="2">
+                    <div class="seat-content">
+                        <div class="seat-avatar">🀫</div>
+                        <div class="seat-name">等待加入...</div>
+                        <div class="seat-status"></div>
+                    </div>
+                </div>
+                <div class="seats-middle">
+                    <div class="seat" data-seat="1">
+                        <div class="seat-content">
+                            <div class="seat-avatar">🀫</div>
+                            <div class="seat-name">等待加入...</div>
+                            <div class="seat-status"></div>
+                        </div>
+                    </div>
+                    <div class="room-center">
+                        <div id="room-countdown"></div>
+                    </div>
+                    <div class="seat" data-seat="3">
+                        <div class="seat-content">
+                            <div class="seat-avatar">🀫</div>
+                            <div class="seat-name">等待加入...</div>
+                            <div class="seat-status"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="seat seat-self" data-seat="0">
+                    <div class="seat-content">
+                        <div class="seat-avatar">🀄</div>
+                        <div class="seat-name">你</div>
+                        <div class="seat-status"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="room-actions">
+                <button id="ready-btn" class="btn btn-primary btn-large">准备</button>
+                <button id="start-btn" class="btn btn-success btn-large" style="display:none">开始游戏</button>
+            </div>
+
+            <div class="room-chat">
+                <div id="chat-messages" class="chat-messages"></div>
+                <form id="chat-form" class="chat-input">
+                    <input type="text" id="chat-input" placeholder="输入消息..." maxlength="200">
+                    <button type="submit" class="btn">发送</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div id="game-screen" class="screen">
+        <div class="game-container">
+            <!-- 顶部玩家 -->
+            <div class="player-area player-top" id="player-top">
+                <div class="player-info">
+                    <span class="player-name"></span>
+                    <span class="player-score"></span>
+                </div>
+                <div class="player-discards"></div>
+                <div class="player-melds"></div>
+                <div class="player-hand">
+                    <div class="hand-tiles"></div>
+                </div>
+            </div>
+
+            <!-- 中间区域 -->
+            <div class="game-middle">
+                <!-- 左侧玩家 -->
+                <div class="player-area player-left" id="player-left">
+                    <div class="player-info">
+                        <span class="player-name"></span>
+                        <span class="player-score"></span>
+                    </div>
+                    <div class="player-discards"></div>
+                    <div class="player-melds"></div>
+                    <div class="player-hand">
+                        <div class="hand-tiles"></div>
+                    </div>
+                </div>
+
+                <!-- 中央区域 -->
+                <div class="game-center">
+                    <div class="center-info">
+                        <div id="wind-indicator">东1局</div>
+                        <div id="tiles-remaining">剩余: 70</div>
+                        <div id="dora-indicators"></div>
+                    </div>
+                    <div id="center-discards" class="center-discards"></div>
+                    <div id="turn-indicator" class="turn-indicator"></div>
+                    <div id="action-timer" class="action-timer"></div>
+                </div>
+
+                <!-- 右侧玩家 -->
+                <div class="player-area player-right" id="player-right">
+                    <div class="player-info">
+                        <span class="player-name"></span>
+                        <span class="player-score"></span>
+                    </div>
+                    <div class="player-discards"></div>
+                    <div class="player-melds"></div>
+                    <div class="player-hand">
+                        <div class="hand-tiles"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部玩家（自己） -->
+            <div class="player-area player-bottom" id="player-bottom">
+                <div class="my-melds" id="my-melds"></div>
+                <div class="my-hand" id="my-hand"></div>
+                <div class="my-drawn-tile" id="my-drawn-tile"></div>
+            </div>
+
+            <!-- 动作按钮 -->
+            <div id="action-buttons" class="action-buttons hidden">
+                <button class="action-btn" id="btn-chow">吃</button>
+                <button class="action-btn" id="btn-pong">碰</button>
+                <button class="action-btn" id="btn-kong">杠</button>
+                <button class="action-btn" id="btn-mahjong">胡</button>
+                <button class="action-btn" id="btn-pass">过</button>
+            </div>
+
+            <!-- 玩家信息栏 -->
+            <div class="game-info-bar">
+                <div class="my-info">
+                    <span id="my-name"></span>
+                    <span id="my-score"></span>
+                </div>
+                <div class="my-flowers" id="my-flowers"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏结果模态框 -->
+    <div id="game-result-modal" class="modal">
+        <div class="modal-content modal-large">
+            <h2 id="result-title">游戏结束</h2>
+            <div id="result-content"></div>
+            <div class="modal-actions">
+                <button id="result-replay" class="btn btn-secondary">观看回放</button>
+                <button id="result-continue" class="btn btn-primary">继续</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 回放界面 -->
+    <div id="replay-screen" class="screen">
+        <header class="replay-header">
+            <button id="exit-replay-btn" class="btn btn-small">← 退出回放</button>
+            <div class="replay-info">
+                <span id="replay-title">回放</span>
+            </div>
+            <div class="replay-controls">
+                <button id="replay-prev" class="btn btn-small">⏮ 上一步</button>
+                <button id="replay-play" class="btn btn-small">▶ 播放</button>
+                <button id="replay-next" class="btn btn-small">下一步 ⏭</button>
+                <select id="replay-speed">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="2">2x</option>
+                    <option value="4">4x</option>
+                </select>
+            </div>
+        </header>
+        <main class="replay-main">
+            <div class="game-container" id="replay-game-container">
+                <!-- 回放游戏内容 -->
+            </div>
+            <div class="replay-timeline">
+                <input type="range" id="replay-slider" min="0" max="100" value="0">
+                <span id="replay-step">0 / 0</span>
+            </div>
+        </main>
+    </div>
+
+    <!-- 吃牌选择模态框 -->
+    <div id="chow-modal" class="modal">
+        <div class="modal-content">
+            <h3>选择吃牌组合</h3>
+            <div id="chow-options" class="chow-options"></div>
+            <button id="cancel-chow" class="btn btn-secondary">取消</button>
+        </div>
+    </div>
+
+    <!-- 通知提示 -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/tile-renderer.js"></script>
+    <script src="js/socket-handler.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/lobby.js"></script>
+    <script src="js/room.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/replay.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
