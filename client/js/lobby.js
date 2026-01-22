@@ -3,12 +3,17 @@
  */
 
 const Lobby = {
+    initialized: false,
+    
     /**
      * 初始化大厅
      */
     init() {
-        this.setupEventListeners();
-        this.setupSocketListeners();
+        if (!this.initialized) {
+            this.setupEventListeners();
+            this.setupSocketListeners();
+            this.initialized = true;
+        }
         this.requestLobbyInfo();
         this.loadRankings();
     },

@@ -36,10 +36,15 @@ class LobbyManager {
      * 从大厅移除玩家
      */
     removePlayer(socket) {
+        if (!this.onlinePlayers.has(socket.id)) {
+            return; // 玩家不在大厅中，无需移除
+        }
         this.onlinePlayers.delete(socket.id);
         socket.leave('lobby');
         this.broadcastLobbyUpdate();
-        console.log(`玩家 ${socket.username} 离开大厅`);
+        if (socket.username) {
+            console.log(`玩家 ${socket.username} 离开大厅`);
+        }
     }
 
     /**

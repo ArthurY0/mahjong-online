@@ -159,8 +159,11 @@ class DatabaseManager {
     /**
      * 创建用户
      */
-    createUser(username, passwordHash) {
+    async createUser(username, password) {
         try {
+            const bcrypt = require('bcryptjs');
+            const passwordHash = await bcrypt.hash(password, 10);
+            
             this.run(
                 'INSERT INTO users (username, password_hash) VALUES (?, ?)',
                 [username, passwordHash]
@@ -184,10 +187,33 @@ class DatabaseManager {
     }
 
     /**
-     * 获取用户
+     * 获取用户（通过用户名）
      */
     getUser(username) {
         return this.get('SELECT * FROM users WHERE username = ?', [username]);
+    }
+
+    /**
+     * 获取用户（别名）
+     */
+    getUserByUsername(username) {
+        return this.getUser(username);
+    }
+
+    /**
+     * 验证密码
+     */
+    async verifyPassword(password, hash) {
+        const bcrypt = require('bcryptjs');
+        return bcrypt.compare(password, hash);
+    }
+
+    /**
+     * 哈希密码
+     */
+    async hashPassword(password) {
+        const bcrypt = require('bcryptjs');
+        return bcrypt.hash(password, 10);
     }
 
     /**

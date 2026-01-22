@@ -6,6 +6,7 @@ const Room = {
     currentRoom: null,
     isReady: false,
     isHost: false,
+    initialized: false,
 
     /**
      * 进入房间
@@ -15,8 +16,11 @@ const Room = {
         this.isHost = room.players.some(p => p.isHost && p.id === Auth.getUser().id);
         this.isReady = false;
 
-        this.setupEventListeners();
-        this.setupSocketListeners();
+        if (!this.initialized) {
+            this.setupEventListeners();
+            this.setupSocketListeners();
+            this.initialized = true;
+        }
         this.updateRoomUI();
 
         Utils.switchScreen('room-screen');
@@ -197,7 +201,11 @@ const Room = {
      */
     leaveRoom() {
         socketHandler.emit('leaveRoom');
-        this.cleanup();
+        // 不在这里调用 cleanup()，等待服务器返回 roomLeft 事件后再清理
+        // 同时直接切换界面，防止用户等待
+        this.currentRoom = null;
+        Utils.switchScreen('lobby-screen');
+        Lobby.requestLobbyInfo();
     },
 
     /**

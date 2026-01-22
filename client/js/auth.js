@@ -215,14 +215,27 @@ const Auth = {
      * 退出登录
      */
     logout() {
+        // 清除所有存储的认证信息
         Utils.storage.remove('authToken');
         Utils.storage.remove('user');
         this.currentUser = null;
 
-        socketHandler.disconnect();
+        // 断开 socket 连接
+        if (socketHandler && socketHandler.socket) {
+            socketHandler.disconnect();
+        }
         
-        // 重新加载页面
-        window.location.reload();
+        // 直接切换到认证界面，不刷新页面
+        Utils.switchScreen('auth-screen');
+        
+        // 重新连接服务器
+        socketHandler.connect().then(() => {
+            console.log('重新连接服务器成功');
+        }).catch((error) => {
+            console.error('重新连接失败:', error);
+            // 如果重新连接失败，刷新页面
+            window.location.reload();
+        });
     },
 
     /**
