@@ -1,19 +1,16 @@
-FROM node:14
+FROM node:18-alpine
 
-# Set the working directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
-COPY server/package*.json ./
+COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+RUN npm ci --omit=dev
 
-# Copy the rest of the application files
-COPY server/ .
+COPY . .
 
-# Expose the port the app runs on
+RUN mkdir -p /usr/src/app/data
+
 EXPOSE 3000
 
-# Command to run the application
-CMD ["node", "index.js"]
+# 修复：正确的入口文件路径
+CMD ["node", "server/index.js"]

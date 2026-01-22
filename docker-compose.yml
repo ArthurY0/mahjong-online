@@ -1,38 +1,14 @@
-version: '3.8'
-
 services:
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
+  mahjong:
+    build: .
+    container_name: mahjong-online
     ports:
       - "3000:3000"
-    networks:
-      - mahjong-network
-
-  server:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    ports:
-      - "5000:5000"
     volumes:
-      - ./data:/app/data
-    networks:
-      - mahjong-network
+      - mahjong-data:/usr/src/app/data
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
 
-  nginx:
-    build:
-      context: ./docker/nginx
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - client
-      - server
-    networks:
-      - mahjong-network
-
-networks:
-  mahjong-network:
-    driver: bridge
+volumes:
+  mahjong-data:
