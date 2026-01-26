@@ -555,45 +555,349 @@
 }
 
 /* 响应式设计 */
+
+/* 平板设备 */
 @media (max-width: 1200px) {
     .my-hand .tile {
-        width: 40px;
-        height: 56px;
-        font-size: 28px;
+        width: 52px;
+        height: 73px;
+        font-size: 36px;
     }
-    
+
     .my-drawn-tile .tile {
-        width: 40px;
-        height: 56px;
-        font-size: 28px;
+        width: 52px;
+        height: 73px;
+        font-size: 36px;
+    }
+
+    .player-discards {
+        max-width: 200px;
+    }
+
+    .player-discards .tile {
+        width: 26px;
+        height: 36px;
+        font-size: 18px;
     }
 }
 
+/* 手机横屏和小平板 */
+@media (max-width: 900px) {
+    .my-hand .tile {
+        width: 45px;
+        height: 63px;
+        font-size: 32px;
+    }
+
+    .my-drawn-tile .tile {
+        width: 45px;
+        height: 63px;
+        font-size: 32px;
+    }
+
+    .my-hand {
+        gap: 2px;
+        padding: 8px;
+    }
+
+    .my-drawn-tile {
+        margin-left: 10px;
+        padding: 8px;
+    }
+
+    .action-buttons {
+        bottom: 180px;
+        padding: 10px 15px;
+    }
+
+    .action-btn {
+        padding: 10px 18px;
+        font-size: 16px;
+    }
+
+    .player-info {
+        min-width: 120px;
+        padding: 6px 12px;
+    }
+
+    .center-info {
+        padding: 8px 15px;
+        gap: 15px;
+    }
+}
+
+/* 手机竖屏 */
 @media (max-width: 768px) {
+    .game-container {
+        grid-template-rows: auto 1fr auto;
+    }
+
     .game-middle {
         flex-direction: column;
+        padding: 0 10px;
     }
-    
+
     .player-left,
     .player-right {
         width: 100%;
         flex-direction: row;
+        justify-content: center;
     }
-    
+
+    .my-hand {
+        gap: 1px;
+        padding: 6px;
+        flex-wrap: wrap;
+        max-width: 100%;
+    }
+
+    .my-hand .tile {
+        width: 38px;
+        height: 53px;
+        font-size: 27px;
+    }
+
+    .my-drawn-tile {
+        margin-left: 8px;
+        padding: 6px;
+    }
+
+    .my-drawn-tile .tile {
+        width: 38px;
+        height: 53px;
+        font-size: 27px;
+    }
+
+    .player-bottom {
+        padding: 10px;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .action-buttons {
+        bottom: 140px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 12px;
+        max-width: 95%;
+    }
+
+    .action-btn {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .player-discards {
+        max-width: 150px;
+    }
+
+    .player-discards .tile {
+        width: 22px;
+        height: 31px;
+        font-size: 15px;
+    }
+
+    .player-left .tile,
+    .player-right .tile {
+        width: 36px;
+        height: 25px;
+        font-size: 15px;
+    }
+
+    .center-info {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    .player-info {
+        min-width: 100px;
+        padding: 5px 10px;
+        font-size: 13px;
+    }
+
+    .game-info-bar {
+        left: 5px;
+        right: 5px;
+        bottom: 5px;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    /* 座位布局手机优化 */
+    .seats-container {
+        gap: 15px;
+    }
+
+    .seats-middle {
+        gap: 20px;
+    }
+
+    .seat {
+        width: 100px;
+        height: 100px;
+    }
+
+    .room-center {
+        width: 70px;
+        height: 70px;
+        font-size: 18px;
+    }
+
+    .seat-avatar {
+        font-size: 32px;
+    }
+
+    .seat-name {
+        font-size: 13px;
+    }
+
+    /* 聊天区域手机优化 */
+    .room-chat {
+        padding: 15px;
+    }
+
+    .chat-messages {
+        height: 150px;
+    }
+
+    .room-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .room-actions .btn {
+        width: 100%;
+    }
+}
+
+/* 超小屏幕手机 */
+@media (max-width: 480px) {
     .my-hand .tile {
         width: 32px;
         height: 45px;
-        font-size: 22px;
+        font-size: 23px;
     }
-    
+
+    .my-drawn-tile .tile {
+        width: 32px;
+        height: 45px;
+        font-size: 23px;
+    }
+
+    .my-hand {
+        gap: 1px;
+        padding: 5px;
+    }
+
+    .my-drawn-tile {
+        margin-left: 5px;
+        padding: 5px;
+    }
+
     .action-buttons {
-        bottom: 150px;
-        flex-wrap: wrap;
-        justify-content: center;
+        bottom: 120px;
+        gap: 6px;
+        padding: 8px 10px;
     }
-    
+
     .action-btn {
-        padding: 8px 16px;
-        font-size: 14px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .player-discards .tile {
+        width: 18px;
+        height: 26px;
+        font-size: 12px;
+    }
+
+    .player-discards {
+        max-width: 120px;
+    }
+
+    .player-left .tile,
+    .player-right .tile {
+        width: 30px;
+        height: 21px;
+        font-size: 12px;
+    }
+
+    .seat {
+        width: 80px;
+        height: 80px;
+    }
+
+    .seat-avatar {
+        font-size: 26px;
+    }
+
+    .room-center {
+        width: 55px;
+        height: 55px;
+        font-size: 16px;
+    }
+
+    .center-info {
+        font-size: 12px;
+    }
+
+    .player-info {
+        min-width: 80px;
+        font-size: 11px;
+    }
+
+    .turn-indicator {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .action-timer {
+        width: 70px;
+        height: 70px;
+        font-size: 26px;
+    }
+
+    /* 模态框手机优化 */
+    .modal-content {
+        padding: 20px;
+        width: 95%;
+    }
+
+    .modal-content h2 {
+        font-size: 18px;
+    }
+
+    /* 大厅手机优化 */
+    .lobby-header {
+        padding: 10px 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .lobby-stats {
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        min-width: 90px;
+        padding: 12px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .lobby-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .lobby-actions .btn {
+        width: 100%;
     }
 }

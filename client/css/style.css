@@ -495,3 +495,107 @@ body {
 .replay-card:hover {
     border-color: var(--primary-color);
 }
+
+/* 手机端基础样式优化 */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    .btn-large {
+        padding: 12px 24px;
+        font-size: 16px;
+    }
+
+    .auth-container {
+        padding: 30px 15px;
+    }
+
+    .auth-container h1 {
+        font-size: 28px;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .modal-content {
+        padding: 20px;
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal-actions .btn {
+        width: 100%;
+    }
+
+    .toast-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+    }
+
+    .toast {
+        padding: 12px 18px;
+        font-size: 14px;
+    }
+
+    .room-list-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .room-card {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .rankings-table th,
+    .rankings-table td {
+        padding: 10px 8px;
+        font-size: 13px;
+    }
+
+    .replays-list {
+        gap: 10px;
+    }
+
+    .replay-card {
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-container h1 {
+        font-size: 24px;
+    }
+
+    .loading-content h1 {
+        font-size: 32px;
+    }
+
+    .lobby-tabs {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .tab-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}

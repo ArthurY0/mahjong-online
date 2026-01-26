@@ -1,20 +1,20 @@
 /* 麻将牌样式 */
 
 .tile {
-    width: 40px;
-    height: 56px;
+    width: 52px;
+    height: 73px;
     background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
-    border-radius: 6px;
+    border-radius: 8px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    font-size: 28px;
+    font-size: 36px;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 
-        0 2px 4px rgba(0, 0, 0, 0.3),
-        inset 0 -2px 0 rgba(0, 0, 0, 0.1),
-        inset 0 2px 0 rgba(255, 255, 255, 0.8);
+    box-shadow:
+        0 3px 6px rgba(0, 0, 0, 0.3),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.1),
+        inset 0 3px 0 rgba(255, 255, 255, 0.8);
     position: relative;
     user-select: none;
 }
@@ -50,20 +50,20 @@
 
 .tile-back::after {
     content: '🀫';
-    font-size: 24px;
+    font-size: 31px;
 }
 
 /* 小尺寸牌 */
 .tile-small {
-    width: 28px;
-    height: 40px;
-    font-size: 20px;
+    width: 36px;
+    height: 52px;
+    font-size: 26px;
 }
 
 /* 横放的牌（吃碰杠） */
 .tile-horizontal {
-    width: 56px;
-    height: 40px;
+    width: 73px;
+    height: 52px;
 }
 
 /* 牌的颜色 */
@@ -119,37 +119,37 @@
 /* 自己的手牌 */
 .my-hand {
     display: flex;
-    gap: 3px;
+    gap: 4px;
     justify-content: center;
-    padding: 10px;
+    padding: 12px;
     background: rgba(0, 0, 0, 0.3);
-    border-radius: 12px;
+    border-radius: 14px;
 }
 
 .my-hand .tile {
-    width: 50px;
-    height: 70px;
-    font-size: 36px;
+    width: 65px;
+    height: 91px;
+    font-size: 47px;
 }
 
 .my-hand .tile:hover {
-    transform: translateY(-15px);
+    transform: translateY(-18px);
 }
 
 /* 摸到的牌 */
 .my-drawn-tile {
     display: flex;
-    margin-left: 15px;
-    padding: 10px;
+    margin-left: 20px;
+    padding: 12px;
     background: rgba(255, 193, 7, 0.2);
-    border-radius: 12px;
+    border-radius: 14px;
 }
 
 .my-drawn-tile .tile {
-    width: 50px;
-    height: 70px;
-    font-size: 36px;
-    border: 2px solid var(--accent-color);
+    width: 65px;
+    height: 91px;
+    font-size: 47px;
+    border: 3px solid var(--accent-color);
 }
 
 /* 副露区域 */
@@ -175,28 +175,28 @@
 /* 花牌区域 */
 .my-flowers {
     display: flex;
-    gap: 5px;
+    gap: 6px;
 }
 
 .my-flowers .tile {
-    width: 30px;
-    height: 42px;
-    font-size: 20px;
+    width: 39px;
+    height: 55px;
+    font-size: 26px;
 }
 
 /* 打出的牌区域 */
 .player-discards {
     display: flex;
     flex-wrap: wrap;
-    gap: 2px;
-    max-width: 180px;
-    padding: 5px;
+    gap: 3px;
+    max-width: 234px;
+    padding: 6px;
 }
 
 .player-discards .tile {
-    width: 24px;
-    height: 34px;
-    font-size: 16px;
+    width: 31px;
+    height: 44px;
+    font-size: 21px;
     cursor: default;
 }
 
@@ -227,9 +227,9 @@
 
 .player-left .tile,
 .player-right .tile {
-    width: 34px;
-    height: 24px;
-    font-size: 14px;
+    width: 44px;
+    height: 31px;
+    font-size: 18px;
 }
 
 /* 中央弃牌区域 */
@@ -302,11 +302,163 @@
 }
 
 .chow-option .tile {
-    width: 40px;
-    height: 56px;
+    width: 52px;
+    height: 73px;
 }
 
 /* Unicode麻将牌符号 */
 .tile-unicode {
     font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+}
+
+/* 响应式牌大小 */
+
+/* 平板设备 */
+@media (max-width: 1200px) {
+    .tile {
+        width: 46px;
+        height: 64px;
+        font-size: 32px;
+        border-radius: 7px;
+    }
+
+    .tile-small {
+        width: 32px;
+        height: 46px;
+        font-size: 23px;
+    }
+
+    .tile-horizontal {
+        width: 64px;
+        height: 46px;
+    }
+
+    .tile-back::after {
+        font-size: 28px;
+    }
+}
+
+/* 手机横屏 */
+@media (max-width: 900px) {
+    .tile {
+        width: 42px;
+        height: 59px;
+        font-size: 30px;
+        border-radius: 6px;
+    }
+
+    .tile-small {
+        width: 28px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .tile-horizontal {
+        width: 59px;
+        height: 42px;
+    }
+
+    .tile-back::after {
+        font-size: 25px;
+    }
+
+    .chow-option .tile {
+        width: 42px;
+        height: 59px;
+    }
+}
+
+/* 手机竖屏 */
+@media (max-width: 768px) {
+    .tile {
+        width: 36px;
+        height: 50px;
+        font-size: 26px;
+        border-radius: 5px;
+    }
+
+    .tile-small {
+        width: 24px;
+        height: 34px;
+        font-size: 17px;
+    }
+
+    .tile-horizontal {
+        width: 50px;
+        height: 36px;
+    }
+
+    .tile-back::after {
+        font-size: 22px;
+    }
+
+    .tile:hover {
+        transform: translateY(-3px);
+    }
+
+    .chow-option .tile {
+        width: 36px;
+        height: 50px;
+    }
+
+    .chow-options {
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .chow-option {
+        gap: 3px;
+        padding: 8px;
+    }
+
+    .my-flowers .tile {
+        width: 32px;
+        height: 45px;
+        font-size: 21px;
+    }
+
+    .meld {
+        gap: 1px;
+        padding: 4px;
+    }
+}
+
+/* 超小屏幕手机 */
+@media (max-width: 480px) {
+    .tile {
+        width: 30px;
+        height: 42px;
+        font-size: 22px;
+        border-radius: 4px;
+    }
+
+    .tile-small {
+        width: 20px;
+        height: 28px;
+        font-size: 14px;
+    }
+
+    .tile-horizontal {
+        width: 42px;
+        height: 30px;
+    }
+
+    .tile-back::after {
+        font-size: 18px;
+    }
+
+    .tile:hover {
+        transform: translateY(-2px);
+    }
+
+    .chow-option .tile {
+        width: 30px;
+        height: 42px;
+    }
+
+    .my-flowers .tile {
+        width: 26px;
+        height: 36px;
+        font-size: 17px;
+    }
 }
