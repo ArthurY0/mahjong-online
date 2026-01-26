@@ -470,28 +470,62 @@ class WinningChecker {
 
     // 辅助检查方法
     checkFlush(melds, pair) {
+        // 清一色：全部由同一花色的数牌组成，不能有字牌
+        // 检查雀头是否为字牌
+        if (pair.isHonorTile()) return false;
+
         const types = new Set();
-        melds.forEach(m => m.forEach(t => {
-            if (t.isNumberTile()) types.add(t.type);
-        }));
-        if (pair.isNumberTile()) types.add(pair.type);
-        return types.size === 1 && !melds.some(m => m.some(t => t.isHonorTile()));
+        types.add(pair.type);
+
+        for (const meld of melds) {
+            for (const tile of meld) {
+                // 如果有字牌，不是清一色
+                if (tile.isHonorTile()) return false;
+                types.add(tile.type);
+            }
+        }
+
+        // 只有一种花色
+        return types.size === 1;
     }
 
     checkHalfFlush(melds, pair) {
+        // 混一色：由一种花色的数牌和字牌组成，必须同时有数牌和字牌
         const numberTypes = new Set();
         let hasHonor = false;
-        melds.forEach(m => m.forEach(t => {
-            if (t.isNumberTile()) numberTypes.add(t.type);
-            if (t.isHonorTile()) hasHonor = true;
-        }));
-        if (pair.isNumberTile()) numberTypes.add(pair.type);
-        if (pair.isHonorTile()) hasHonor = true;
-        return numberTypes.size === 1 && hasHonor;
+        let hasNumber = false;
+
+        for (const meld of melds) {
+            for (const tile of meld) {
+                if (tile.isNumberTile()) {
+                    numberTypes.add(tile.type);
+                    hasNumber = true;
+                }
+                if (tile.isHonorTile()) {
+                    hasHonor = true;
+                }
+            }
+        }
+
+        if (pair.isNumberTile()) {
+            numberTypes.add(pair.type);
+            hasNumber = true;
+        }
+        if (pair.isHonorTile()) {
+            hasHonor = true;
+        }
+
+        // 混一色需要：只有一种数牌花色，并且同时有数牌和字牌
+        return numberTypes.size === 1 && hasHonor && hasNumber;
     }
 
     checkAllPongs(melds) {
-        return melds.every(m => m.length === 3 && m[0].equals(m[1]) && m[1].equals(m[2]));
+        // 检查所有面子是否都是刻子或杠（3张或4张相同的牌）
+        return melds.every(m => {
+            if (m.length < 3 || m.length > 4) return false;
+            // 检查所有牌是否相同
+            return m.every(tile => tile.equals(m[0]));
+        });
     }
 
     checkAllTerminals(melds, pair) {
@@ -506,14 +540,24 @@ class WinningChecker {
 
     checkPinfu(melds, pair, context) {
         // 平和：全顺子，雀头不是役牌，两面听
-        const allSequence = melds.every(m => {
-            if (m.length !== 3) return false;
-            return !m[0].equals(m[1]); // 顺子的前两张不同
-        });
-        
+        const isSequence = (meld) => {
+            // 顺子必须是3张牌
+            if (meld.length !== 3) return false;
+            // 必须是数牌
+            if (!meld[0].isNumberTile()) return false;
+            // 检查是否连续且同花色
+            const sorted = [...meld].sort((a, b) => a.value - b.value);
+            return sorted[0].type === sorted[1].type &&
+                   sorted[1].type === sorted[2].type &&
+                   sorted[1].value === sorted[0].value + 1 &&
+                   sorted[2].value === sorted[1].value + 1;
+        };
+
+        const allSequence = melds.every(m => isSequence(m));
+
         if (!allSequence) return false;
         if (pair.isHonorTile()) return false;
-        
+
         return true;
     }
 }
