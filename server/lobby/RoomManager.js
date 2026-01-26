@@ -186,13 +186,22 @@ class RoomManager {
      * 处理聊天消息
      */
     handleChat(socket, message) {
+        // 验证输入
+        if (!message || typeof message !== 'string') {
+            return;
+        }
+
         const roomId = this.playerRooms.get(socket.userId);
         if (!roomId) return;
+
+        // 清理消息内容
+        const cleanMessage = message.trim().substring(0, 200);
+        if (!cleanMessage) return;
 
         this.broadcastToRoom(roomId, 'roomChat', {
             playerId: socket.userId,
             username: socket.username,
-            message: message.substring(0, 200), // 限制消息长度
+            message: cleanMessage,
             timestamp: Date.now()
         });
     }
