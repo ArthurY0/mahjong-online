@@ -81,6 +81,10 @@ const Room = {
 
         socketHandler.on('playerReady', (data) => {
             this.currentRoom = data.room;
+            // 如果是自己的准备状态变化，同步本地状态
+            if (data.playerId === Auth.getUser().id) {
+                this.isReady = data.ready;
+            }
             this.updateRoomUI();
         });
 
@@ -193,7 +197,9 @@ const Room = {
      */
     toggleReady() {
         this.isReady = !this.isReady;
-        socketHandler.emit('setReady', { ready: this.isReady });
+        socketHandler.emit('playerReady', { ready: this.isReady });
+        // 立即更新本地UI，提供即时反馈
+        this.updateRoomUI();
     },
 
     /**

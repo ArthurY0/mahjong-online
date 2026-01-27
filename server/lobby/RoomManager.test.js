@@ -193,4 +193,77 @@ describe('RoomManager', () => {
             expect(roomManager.playerRooms.has(socket2.userId)).toBe(false);
         });
     });
+
+    describe('setPlayerReady - 玩家准备状态', () => {
+        test('应该正确设置玩家准备状态', () => {
+            const socket1 = createMockSocket(1, 'Player1');
+            const socket2 = createMockSocket(2, 'Player2');
+
+            roomManager.createRoom(socket1, { name: 'Test Room' });
+            const roomId = roomManager.playerRooms.get(socket1.userId);
+            roomManager.joinRoom(socket2, roomId);
+
+            // 玩家2准备
+            roomManager.setPlayerReady(socket2, true);
+
+            const room = roomManager.rooms.get(roomId);
+            const player2 = room.players.find(p => p.id === socket2.userId);
+            expect(player2.ready).toBe(true);
+        });
+
+        test('应该广播准备状态给房间内所有玩家', () => {
+            const socket1 = createMockSocket(1, 'Player1');
+            const socket2 = createMockSocket(2, 'Player2');
+
+            roomManager.createRoom(socket1, { name: 'Test Room' });
+            const roomId = roomManager.playerRooms.get(socket1.userId);
+            roomManager.joinRoom(socket2, roomId);
+
+            // 清除之前的调用记录
+            mockIO.to.mockClear();
+
+            // 玩家2准备
+            roomManager.setPlayerReady(socket2, true);
+
+            // 检查是否广播了 playerReady 事件
+            expect(mockIO.to).toHaveBeenCalledWith(`room:${roomId}`);
+
+            const calls = mockIO.to.mock.results;
+            const lastCall = calls[calls.length - 1];
+            const emitCall = lastCall.value.emit.mock.calls.find(c => c[0] === 'playerReady');
+
+            expect(emitCall).toBeDefined();
+            expect(emitCall[1].playerId).toBe(socket2.userId);
+            expect(emitCall[1].ready).toBe(true);
+            expect(emitCall[1].room).toBeDefined();
+        });
+
+        test('应该可以取消准备', () => {
+            const socket1 = createMockSocket(1, 'Player1');
+            const socket2 = createMockSocket(2, 'Player2');
+
+            roomManager.createRoom(socket1, { name: 'Test Room' });
+            const roomId = roomManager.playerRooms.get(socket1.userId);
+            roomManager.joinRoom(socket2, roomId);
+
+            // 先准备
+            roomManager.setPlayerReady(socket2, true);
+            // 再取消准备
+            roomManager.setPlayerReady(socket2, false);
+
+            const room = roomManager.rooms.get(roomId);
+            const player2 = room.players.find(p => p.id === socket2.userId);
+            expect(player2.ready).toBe(false);
+        });
+
+        test('不在房间内的玩家不能设置准备状态', () => {
+            const socket1 = createMockSocket(1, 'Player1');
+            const outsideSocket = createMockSocket(99, 'Outsider');
+
+            roomManager.createRoom(socket1, { name: 'Test Room' });
+
+            // 不在房间内的玩家尝试准备，不应抛出错误
+            expect(() => roomManager.setPlayerReady(outsideSocket, true)).not.toThrow();
+        });
+    });
 });
