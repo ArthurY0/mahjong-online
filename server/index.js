@@ -244,6 +244,13 @@ io.on('connection', (socket) => {
         }
     });
 
+    // 游戏内聊天
+    socket.on('gameChat', (data) => {
+        if (roomManager && data) {
+            roomManager.handleGameChat(socket, data);
+        }
+    });
+
     // 开始游戏
     socket.on('startGame', () => {
         if (roomManager) {

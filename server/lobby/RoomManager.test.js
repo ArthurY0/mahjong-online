@@ -266,4 +266,190 @@ describe('RoomManager', () => {
             expect(() => roomManager.setPlayerReady(outsideSocket, true)).not.toThrow();
         });
     });
+
+    describe('handleGameChat - 游戏内聊天消息处理', () => {
+        let socket1, socket2;
+        let roomId;
+
+        beforeEach(() => {
+            socket1 = createMockSocket(1, 'Player1');
+            socket2 = createMockSocket(2, 'Player2');
+
+            // 创建房间并加入玩家
+            roomManager.createRoom(socket1, { name: 'Test Room' });
+            roomId = roomManager.playerRooms.get(socket1.userId);
+            roomManager.joinRoom(socket2, roomId);
+
+            // 设置房间状态为游戏中
+            const room = roomManager.rooms.get(roomId);
+            room.status = 'playing';
+        });
+
+        test('应该正确广播文字消息', () => {
+            roomManager.handleGameChat(socket1, { message: 'Hello Game!', type: 'text' });
+
+            // 检查是否调用了 io.to
+            expect(mockIO.to).toHaveBeenCalledWith(`room:${roomId}`);
+
+            const calls = mockIO.to.mock.results;
+            const lastCall = calls[calls.length - 1];
+            const emitCall = lastCall.value.emit.mock.calls.find(c => c[0] === 'gameChat');
+
+            expect(emitCall).toBeDefined();
+            expect(emitCall[1].username).toBe('Player1');
+            expect(emitCall[1].message).toBe('Hello Game!');
+            expect(emitCall[1].type).toBe('text');
+        });
+
+        test('应该正确广播快捷消息', () => {
+            roomManager.handleGameChat(socket1, { message: '好牌!', type: 'quick' });
+
+            const calls = mockIO.to.mock.results;
+            const lastCall = calls[calls.length - 1];
+            const emitCall = lastCall.value.emit.mock.calls.find(c => c[0] === 'gameChat');
+
+            expect(emitCall).toBeDefined();
+            expect(emitCall[1].type).toBe('quick');
+            expect(emitCall[1].message).toBe('好牌!');
+        });
+
+        test('应该限制消息长度为100字符', () => {
+            const longMessage = 'a'.repeat(150);
+            roomManager.handleGameChat(socket1, { message: longMessage, type: 'text' });
+
+            const calls = mockIO.to.mock.results;
+            const lastCall = calls[calls.length - 1];
+            const emitCall = lastCall.value.emit.mock.calls.find(c => c[0] === 'gameChat');
+
+            expect(emitCall[1].message.length).toBe(100);
+        });
+
+        test('应该忽略空消息', () => {
+            mockIO.to.mockClear();
+            roomManager.handleGameChat(socket1, { message: '', type: 'text' });
+            roomManager.handleGameChat(socket1, { message: '   ', type: 'text' });
+
+            const gameChatCalls = mockIO.to.mock.results.filter(r => {
+                const emitCalls = r.value.emit.mock.calls;
+                return emitCalls.some(c => c[0] === 'gameChat');
+            });
+
+            expect(gameChatCalls.length).toBe(0);
+        });
+
+        test('应该忽略null/undefined消息', () => {
+            expect(() => roomManager.handleGameChat(socket1, { message: null, type: 'text' })).not.toThrow();
+            expect(() => roomManager.handleGameChat(socket1, null)).not.toThrow();
+            expect(() => roomManager.handleGameChat(socket1, undefined)).not.toThrow();
+        });
+
+        test('等待状态的房间不能发送游戏聊天', () => {
+            const room = roomManager.rooms.get(roomId);
+            room.status = 'waiting';
+
+            mockIO.to.mockClear();
+            roomManager.handleGameChat(socket1, { message: 'Test', type: 'text' });
+
+            const gameChatCalls = mockIO.to.mock.results.filter(r => {
+                const emitCalls = r.value.emit.mock.calls;
+                return emitCalls.some(c => c[0] === 'gameChat');
+            });
+
+            expect(gameChatCalls.length).toBe(0);
+        });
+
+        test('不在房间内的玩家不能发送游戏聊天', () => {
+            const outsideSocket = createMockSocket(99, 'Outsider');
+            mockIO.to.mockClear();
+
+            roomManager.handleGameChat(outsideSocket, { message: 'Test', type: 'text' });
+
+            const gameChatCalls = mockIO.to.mock.results.filter(r => {
+                const emitCalls = r.value.emit.mock.calls;
+                return emitCalls.some(c => c[0] === 'gameChat');
+            });
+
+            expect(gameChatCalls.length).toBe(0);
+        });
+
+        test('应该正确处理语音消息', () => {
+            const voiceData = {
+                type: 'voice',
+                audio: 'data:audio/webm;base64,SGVsbG8gV29ybGQ=',
+                duration: 5
+            };
+
+            roomManager.handleGameChat(socket1, voiceData);
+
+            const calls = mockIO.to.mock.results;
+            // 应该有两个广播：gameChat 和 voiceMessage
+            const gameChatCall = calls.find(r =>
+                r.value.emit.mock.calls.some(c => c[0] === 'gameChat')
+            );
+            const voiceMessageCall = calls.find(r =>
+                r.value.emit.mock.calls.some(c => c[0] === 'voiceMessage')
+            );
+
+            expect(gameChatCall).toBeDefined();
+            expect(voiceMessageCall).toBeDefined();
+        });
+
+        test('应该拒绝非法的语音数据格式', () => {
+            mockIO.to.mockClear();
+
+            // 无效的base64前缀
+            roomManager.handleGameChat(socket1, {
+                type: 'voice',
+                audio: 'invalid-audio-data',
+                duration: 5
+            });
+
+            const gameChatCalls = mockIO.to.mock.results.filter(r => {
+                const emitCalls = r.value.emit.mock.calls;
+                return emitCalls.some(c => c[0] === 'gameChat');
+            });
+
+            expect(gameChatCalls.length).toBe(0);
+        });
+
+        test('应该限制语音时长不超过60秒', () => {
+            mockIO.to.mockClear();
+
+            const voiceData = {
+                type: 'voice',
+                audio: 'data:audio/webm;base64,SGVsbG8gV29ybGQ=',
+                duration: 120
+            };
+
+            roomManager.handleGameChat(socket1, voiceData);
+
+            const calls = mockIO.to.mock.results;
+            let emitCall = null;
+            for (const call of calls) {
+                const found = call.value.emit.mock.calls.find(c => c[0] === 'gameChat');
+                if (found) {
+                    emitCall = found;
+                    break;
+                }
+            }
+
+            expect(emitCall).toBeDefined();
+            expect(emitCall[1].duration).toBe(60);
+        });
+
+        test('消息应该包含时间戳和发送者信息', () => {
+            const before = Date.now();
+            roomManager.handleGameChat(socket1, { message: 'Test', type: 'text' });
+            const after = Date.now();
+
+            const calls = mockIO.to.mock.results;
+            const lastCall = calls[calls.length - 1];
+            const emitCall = lastCall.value.emit.mock.calls.find(c => c[0] === 'gameChat');
+
+            expect(emitCall[1].playerId).toBe(socket1.userId);
+            expect(emitCall[1].username).toBe('Player1');
+            expect(emitCall[1].timestamp).toBeGreaterThanOrEqual(before);
+            expect(emitCall[1].timestamp).toBeLessThanOrEqual(after);
+        });
+    });
 });

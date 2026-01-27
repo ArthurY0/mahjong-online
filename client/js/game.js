@@ -7,6 +7,11 @@ const Game = {
     selectedTile: null,
     timerInterval: null,
     pendingActions: null,
+    chatOpen: false,
+    unreadCount: 0,
+    mediaRecorder: null,
+    audioChunks: [],
+    isRecording: false,
 
     /**
      * 初始化游戏
@@ -15,10 +20,13 @@ const Game = {
         this.gameState = null;
         this.selectedTile = null;
         this.pendingActions = null;
+        this.chatOpen = false;
+        this.unreadCount = 0;
 
         this.setupSocketListeners();
+        this.setupChatListeners();
         Utils.switchScreen('game-screen');
-        
+
         Utils.showToast('游戏开始!', 'success');
     },
 
@@ -55,6 +63,339 @@ const Game = {
         socketHandler.on('error', (data) => {
             Utils.showToast(data.message, 'error');
         });
+
+        // 游戏内聊天消息
+        socketHandler.on('gameChat', (data) => {
+            this.addGameChatMessage(data);
+        });
+
+        // 语音消息
+        socketHandler.on('voiceMessage', (data) => {
+            this.playVoiceMessage(data);
+        });
+    },
+
+    /**
+     * 设置聊天监听
+     */
+    setupChatListeners() {
+        const toggleBtn = document.getElementById('game-chat-toggle');
+        const closeBtn = document.getElementById('game-chat-close');
+        const chatPanel = document.getElementById('game-chat-panel');
+        const chatInput = document.getElementById('game-chat-input');
+        const sendBtn = document.getElementById('game-chat-send-btn');
+        const voiceBtn = document.getElementById('game-chat-voice-btn');
+        const quickMsgBtns = document.querySelectorAll('.quick-msg-btn');
+
+        if (!toggleBtn || !chatPanel) return;
+
+        // 切换聊天面板
+        toggleBtn.addEventListener('click', () => {
+            this.toggleChatPanel();
+        });
+
+        // 关闭聊天面板
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.closeChatPanel();
+            });
+        }
+
+        // 发送文字消息
+        if (sendBtn) {
+            sendBtn.addEventListener('click', () => {
+                this.sendTextMessage();
+            });
+        }
+
+        // 输入框回车发送
+        if (chatInput) {
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.sendTextMessage();
+                }
+            });
+        }
+
+        // 快捷消息按钮
+        quickMsgBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const msg = btn.getAttribute('data-msg');
+                if (msg) {
+                    this.sendQuickMessage(msg);
+                }
+            });
+        });
+
+        // 语音按钮 - 按住说话
+        if (voiceBtn) {
+            voiceBtn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                this.startVoiceRecording();
+            });
+
+            voiceBtn.addEventListener('mouseup', () => {
+                this.stopVoiceRecording();
+            });
+
+            voiceBtn.addEventListener('mouseleave', () => {
+                if (this.isRecording) {
+                    this.stopVoiceRecording();
+                }
+            });
+
+            // 触摸设备支持
+            voiceBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.startVoiceRecording();
+            });
+
+            voiceBtn.addEventListener('touchend', () => {
+                this.stopVoiceRecording();
+            });
+
+            voiceBtn.addEventListener('touchcancel', () => {
+                if (this.isRecording) {
+                    this.stopVoiceRecording();
+                }
+            });
+        }
+    },
+
+    /**
+     * 切换聊天面板
+     */
+    toggleChatPanel() {
+        const chatPanel = document.getElementById('game-chat-panel');
+        if (this.chatOpen) {
+            this.closeChatPanel();
+        } else {
+            chatPanel.classList.add('open');
+            this.chatOpen = true;
+            this.clearUnreadBadge();
+        }
+    },
+
+    /**
+     * 关闭聊天面板
+     */
+    closeChatPanel() {
+        const chatPanel = document.getElementById('game-chat-panel');
+        chatPanel.classList.remove('open');
+        this.chatOpen = false;
+    },
+
+    /**
+     * 清除未读消息标记
+     */
+    clearUnreadBadge() {
+        this.unreadCount = 0;
+        const badge = document.getElementById('chat-unread-badge');
+        if (badge) {
+            badge.classList.add('hidden');
+            badge.textContent = '0';
+        }
+    },
+
+    /**
+     * 更新未读消息标记
+     */
+    updateUnreadBadge() {
+        if (this.chatOpen) return;
+
+        this.unreadCount++;
+        const badge = document.getElementById('chat-unread-badge');
+        if (badge) {
+            badge.classList.remove('hidden');
+            badge.textContent = this.unreadCount > 99 ? '99+' : this.unreadCount.toString();
+        }
+    },
+
+    /**
+     * 发送文字消息
+     */
+    sendTextMessage() {
+        const chatInput = document.getElementById('game-chat-input');
+        if (!chatInput) return;
+
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        socketHandler.emit('gameChat', {
+            message: message,
+            type: 'text'
+        });
+
+        chatInput.value = '';
+    },
+
+    /**
+     * 发送快捷消息
+     */
+    sendQuickMessage(message) {
+        socketHandler.emit('gameChat', {
+            message: message,
+            type: 'quick'
+        });
+    },
+
+    /**
+     * 添加游戏聊天消息
+     */
+    addGameChatMessage(data) {
+        const container = document.getElementById('game-chat-messages');
+        if (!container) return;
+
+        const messageDiv = document.createElement('div');
+        const isMe = data.playerId === Auth.getUser().id;
+        messageDiv.className = `game-chat-message ${isMe ? 'mine' : ''} ${data.type === 'quick' ? 'quick' : ''}`;
+
+        if (data.type === 'voice') {
+            messageDiv.innerHTML = `
+                <span class="chat-sender">${this.escapeHtml(data.username)}</span>
+                <span class="chat-voice" onclick="Game.playVoiceFromUrl('${data.audioUrl}')">
+                    🔊 语音消息 (${data.duration || '?'}s)
+                </span>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <span class="chat-sender">${this.escapeHtml(data.username)}</span>
+                <span class="chat-content">${this.escapeHtml(data.message)}</span>
+            `;
+        }
+
+        container.appendChild(messageDiv);
+        container.scrollTop = container.scrollHeight;
+
+        // 更新未读消息
+        if (!isMe) {
+            this.updateUnreadBadge();
+        }
+    },
+
+    /**
+     * 开始语音录制
+     */
+    async startVoiceRecording() {
+        if (this.isRecording) return;
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            this.mediaRecorder = new MediaRecorder(stream);
+            this.audioChunks = [];
+
+            this.mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    this.audioChunks.push(event.data);
+                }
+            };
+
+            this.mediaRecorder.onstop = () => {
+                this.processVoiceRecording();
+                // 停止所有音轨
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            this.mediaRecorder.start();
+            this.isRecording = true;
+            this.recordingStartTime = Date.now();
+
+            // 更新按钮状态
+            const voiceBtn = document.getElementById('game-chat-voice-btn');
+            if (voiceBtn) {
+                voiceBtn.classList.add('recording');
+                voiceBtn.textContent = '🔴';
+            }
+
+            Utils.showToast('正在录音...松开发送', 'info');
+        } catch (error) {
+            console.error('无法启动录音:', error);
+            Utils.showToast('无法访问麦克风', 'error');
+        }
+    },
+
+    /**
+     * 停止语音录制
+     */
+    stopVoiceRecording() {
+        if (!this.isRecording || !this.mediaRecorder) return;
+
+        this.mediaRecorder.stop();
+        this.isRecording = false;
+
+        // 恢复按钮状态
+        const voiceBtn = document.getElementById('game-chat-voice-btn');
+        if (voiceBtn) {
+            voiceBtn.classList.remove('recording');
+            voiceBtn.textContent = '🎤';
+        }
+    },
+
+    /**
+     * 处理语音录制
+     */
+    processVoiceRecording() {
+        if (this.audioChunks.length === 0) return;
+
+        const duration = Math.round((Date.now() - this.recordingStartTime) / 1000);
+
+        // 如果录音太短，忽略
+        if (duration < 1) {
+            Utils.showToast('录音太短', 'warning');
+            return;
+        }
+
+        // 如果录音太长，也忽略
+        if (duration > 60) {
+            Utils.showToast('录音超过60秒限制', 'warning');
+            return;
+        }
+
+        const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+
+        // 将音频转换为base64发送
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64Audio = reader.result;
+            socketHandler.emit('gameChat', {
+                type: 'voice',
+                audio: base64Audio,
+                duration: duration
+            });
+        };
+        reader.readAsDataURL(audioBlob);
+    },
+
+    /**
+     * 播放语音消息
+     */
+    playVoiceMessage(data) {
+        if (data.audio) {
+            this.playVoiceFromUrl(data.audio);
+        }
+        this.addGameChatMessage(data);
+    },
+
+    /**
+     * 从URL播放语音
+     */
+    playVoiceFromUrl(audioUrl) {
+        const audio = new Audio(audioUrl);
+        audio.play().catch(err => {
+            console.error('播放语音失败:', err);
+            Utils.showToast('播放语音失败', 'error');
+        });
+    },
+
+    /**
+     * 转义HTML
+     */
+    escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     },
 
     /**
@@ -589,12 +930,38 @@ const Game = {
         this.selectedTile = null;
         this.pendingActions = null;
 
+        // 清理聊天状态
+        this.chatOpen = false;
+        this.unreadCount = 0;
+        this.isRecording = false;
+        this.audioChunks = [];
+        if (this.mediaRecorder) {
+            if (this.mediaRecorder.state !== 'inactive') {
+                this.mediaRecorder.stop();
+            }
+            this.mediaRecorder = null;
+        }
+
+        // 关闭聊天面板
+        const chatPanel = document.getElementById('game-chat-panel');
+        if (chatPanel) {
+            chatPanel.classList.remove('open');
+        }
+
+        // 清空聊天记录
+        const chatMessages = document.getElementById('game-chat-messages');
+        if (chatMessages) {
+            chatMessages.innerHTML = '';
+        }
+
         socketHandler.off('gameState');
         socketHandler.off('actionRequired');
         socketHandler.off('canMahjong');
         socketHandler.off('canKong');
         socketHandler.off('gameEnd');
         socketHandler.off('gameDraw');
+        socketHandler.off('gameChat');
+        socketHandler.off('voiceMessage');
     }
 };
 
