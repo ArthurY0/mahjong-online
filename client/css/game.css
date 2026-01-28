@@ -1,5 +1,13 @@
 /* 游戏界面样式 */
 
+/* 游戏缩放容器 */
+.game-screen {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+}
+
 /* 房间界面 */
 .room-header {
     display: flex;
@@ -177,13 +185,74 @@
 
 /* 游戏界面 */
 .game-container {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
     background: radial-gradient(ellipse at center, #1a472a 0%, #0d2818 100%);
     display: grid;
     grid-template-rows: auto 1fr auto;
     overflow: hidden;
     position: relative;
+    box-sizing: border-box;
+}
+
+/* 牌桌中央弃牌区 */
+.center-discards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    margin: 10px 0;
+    min-width: 280px;
+    max-width: 400px;
+}
+
+.center-discards .player-discard-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.center-discards .player-discard-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
+}
+
+.center-discards .player-discard-label.current-turn {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.center-discards .discard-tiles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    justify-content: center;
+    max-width: 80px;
+}
+
+.center-discards .discard-tiles .tile {
+    width: 22px;
+    height: 30px;
+    font-size: 14px;
+}
+
+.center-discards .discard-tiles .tile.last-discard {
+    box-shadow: 0 0 8px 2px var(--accent-color);
+    animation: lastDiscardPulse 1s infinite;
+}
+
+@keyframes lastDiscardPulse {
+    0%, 100% { box-shadow: 0 0 8px 2px var(--accent-color); }
+    50% { box-shadow: 0 0 12px 4px var(--accent-color); }
 }
 
 /* 玩家区域 */
@@ -297,27 +366,38 @@
 
 /* 动作计时器 */
 .action-timer {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.7);
+    border: 3px solid rgba(255, 255, 255, 0.3);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 36px;
+    font-size: 32px;
     font-weight: bold;
     color: white;
-    margin-top: 20px;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    position: relative;
+    z-index: 50;
 }
 
 .action-timer.warning {
     color: var(--warning-color);
+    border-color: var(--warning-color);
     animation: timerWarning 0.5s infinite;
 }
 
 .action-timer.danger {
     color: var(--error-color);
+    border-color: var(--error-color);
     animation: timerWarning 0.25s infinite;
+    background: rgba(244, 67, 54, 0.3);
+}
+
+.action-timer.hidden {
+    display: none;
 }
 
 @keyframes timerWarning {
@@ -630,6 +710,31 @@
 @media (max-width: 768px) {
     .game-container {
         grid-template-rows: auto 1fr auto;
+        transform-origin: top left;
+    }
+
+    /* 中央弃牌区手机优化 */
+    .center-discards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        padding: 8px;
+        min-width: 180px;
+        max-width: 240px;
+    }
+
+    .center-discards .player-discard-label {
+        font-size: 9px;
+        max-width: 60px;
+    }
+
+    .center-discards .discard-tiles {
+        max-width: 60px;
+    }
+
+    .center-discards .discard-tiles .tile {
+        width: 18px;
+        height: 24px;
+        font-size: 11px;
     }
 
     .game-middle {
@@ -910,6 +1015,33 @@
         padding-bottom: env(safe-area-inset-bottom, 0);
         height: 100vh;
         height: 100dvh; /* 动态视口高度 */
+        overflow: hidden;
+    }
+
+    /* 中央弃牌区 iPhone优化 */
+    .center-discards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4px;
+        padding: 6px;
+        min-width: 140px;
+        max-width: 200px;
+        margin: 5px 0;
+    }
+
+    .center-discards .player-discard-label {
+        font-size: 8px;
+        max-width: 50px;
+    }
+
+    .center-discards .discard-tiles {
+        max-width: 50px;
+    }
+
+    .center-discards .discard-tiles .tile {
+        width: 14px;
+        height: 19px;
+        font-size: 9px;
+        border-radius: 2px;
     }
 
     /* 优化玩家底部区域 */
