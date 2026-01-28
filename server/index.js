@@ -237,6 +237,20 @@ io.on('connection', (socket) => {
         }
     });
 
+    // 房间聊天
+    socket.on('roomChat', (data) => {
+        if (roomManager && data && data.message) {
+            roomManager.handleChat(socket, data.message);
+        }
+    });
+
+    // 游戏内聊天
+    socket.on('gameChat', (data) => {
+        if (roomManager && data) {
+            roomManager.handleGameChat(socket, data);
+        }
+    });
+
     // 开始游戏
     socket.on('startGame', () => {
         if (roomManager) {

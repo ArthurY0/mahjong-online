@@ -350,6 +350,33 @@
                 </div>
                 <div class="my-flowers" id="my-flowers"></div>
             </div>
+
+            <!-- 游戏内聊天按钮 -->
+            <button id="game-chat-toggle" class="game-chat-toggle">
+                💬
+                <span class="unread-badge hidden" id="chat-unread-badge">0</span>
+            </button>
+
+            <!-- 游戏内聊天面板 -->
+            <div id="game-chat-panel" class="game-chat-panel">
+                <div class="game-chat-header">
+                    <h4>💬 游戏聊天</h4>
+                    <button id="game-chat-close" class="game-chat-close">✕</button>
+                </div>
+                <div id="game-chat-messages" class="game-chat-messages"></div>
+                <div class="game-chat-quick">
+                    <button class="quick-msg-btn" data-msg="好牌!">好牌!</button>
+                    <button class="quick-msg-btn" data-msg="等一下">等一下</button>
+                    <button class="quick-msg-btn" data-msg="快点">快点</button>
+                    <button class="quick-msg-btn" data-msg="厉害">厉害</button>
+                    <button class="quick-msg-btn" data-msg="再来一局">再来</button>
+                </div>
+                <div class="game-chat-input-area">
+                    <input type="text" id="game-chat-input" placeholder="输入消息..." maxlength="100">
+                    <button id="game-chat-voice-btn" class="game-chat-voice-btn" title="按住说话">🎤</button>
+                    <button id="game-chat-send-btn" class="game-chat-send-btn">➤</button>
+                </div>
+            </div>
         </div>
     </div>
 

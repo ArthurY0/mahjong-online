@@ -90,17 +90,16 @@ class MahjongGame {
         // 每人13张
         for (let round = 0; round < 13; round++) {
             this.players.forEach((player, index) => {
-                const tile = this.tileWall.draw();
+                let tile = this.tileWall.draw();
                 if (tile) {
-                    // 检查花牌
-                    if (tile.isFlowerTile()) {
+                    // 循环处理花牌，直到摸到非花牌
+                    while (tile && tile.isFlowerTile()) {
                         this.hands[player.id].addFlower(tile);
                         // 补一张
-                        const replaceTile = this.tileWall.draw();
-                        if (replaceTile) {
-                            this.hands[player.id].addTile(replaceTile);
-                        }
-                    } else {
+                        tile = this.tileWall.draw();
+                    }
+                    // 添加非花牌到手牌
+                    if (tile) {
                         this.hands[player.id].addTile(tile);
                     }
                 }
@@ -351,29 +350,49 @@ class MahjongGame {
             if (playerIndex !== this.currentPlayer) {
                 return { success: false, error: '不是你的回合' };
             }
-            
+
             const tile = tileData ? Tile.fromJSON(tileData) : null;
-            if (!tile || hand.countTile(tile) < 4) {
+            if (!tile) {
+                return { success: false, error: '不能暗杠' };
+            }
+
+            // 计算手牌中该牌的数量（包括drawnTile）
+            let totalCount = hand.countTile(tile);
+            if (hand.drawnTile && hand.drawnTile.equals(tile)) {
+                totalCount++;
+            }
+
+            if (totalCount < 4) {
                 return { success: false, error: '不能暗杠' };
             }
 
             const tiles = [];
-            for (let i = 0; i < 4; i++) {
-                const removed = hand.removeTile(tile);
-                if (removed) tiles.push(removed);
-            }
+            // 先从drawnTile移除（如果匹配）
             if (hand.drawnTile && hand.drawnTile.equals(tile)) {
                 tiles.push(hand.drawnTile);
                 hand.drawnTile = null;
             }
+            // 从手牌中移除剩余的牌
+            while (tiles.length < 4) {
+                const removed = hand.removeTile(tile);
+                if (removed) {
+                    tiles.push(removed);
+                } else {
+                    break;
+                }
+            }
+
+            if (tiles.length !== 4) {
+                return { success: false, error: '暗杠失败' };
+            }
 
             hand.addMeld(new Meld('kong', tiles, true));
-            
+
             this.logAction('concealedKong', { player: playerIndex, tiles: tiles.map(t => t.toJSON()) });
-            
+
             // 翻宝牌
             this.tileWall.revealDora();
-            
+
             // 从岭上摸牌
             this.drawFromDeadWall(playerIndex);
 

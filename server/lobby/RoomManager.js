@@ -186,15 +186,80 @@ class RoomManager {
      * 处理聊天消息
      */
     handleChat(socket, message) {
+        // 验证输入
+        if (!message || typeof message !== 'string') {
+            return;
+        }
+
         const roomId = this.playerRooms.get(socket.userId);
         if (!roomId) return;
+
+        // 清理消息内容
+        const cleanMessage = message.trim().substring(0, 200);
+        if (!cleanMessage) return;
 
         this.broadcastToRoom(roomId, 'roomChat', {
             playerId: socket.userId,
             username: socket.username,
-            message: message.substring(0, 200), // 限制消息长度
+            message: cleanMessage,
             timestamp: Date.now()
         });
+    }
+
+    /**
+     * 处理游戏内聊天消息
+     */
+    handleGameChat(socket, data) {
+        // 验证输入
+        if (!data) return;
+
+        const roomId = this.playerRooms.get(socket.userId);
+        if (!roomId) return;
+
+        const room = this.rooms.get(roomId);
+        if (!room) return;
+
+        // 验证是否在游戏中
+        if (room.status !== 'playing') return;
+
+        const chatData = {
+            playerId: socket.userId,
+            username: socket.username,
+            timestamp: Date.now()
+        };
+
+        if (data.type === 'voice') {
+            // 语音消息
+            if (!data.audio || typeof data.audio !== 'string') return;
+
+            // 验证base64格式
+            if (!data.audio.startsWith('data:audio/')) return;
+
+            // 限制语音大小 (约1MB base64)
+            if (data.audio.length > 1500000) {
+                socket.emit('error', { message: '语音消息过大' });
+                return;
+            }
+
+            chatData.type = 'voice';
+            chatData.audio = data.audio;
+            chatData.audioUrl = data.audio;
+            chatData.duration = Math.min(data.duration || 0, 60);
+
+            this.broadcastToRoom(roomId, 'gameChat', chatData);
+            this.broadcastToRoom(roomId, 'voiceMessage', chatData);
+        } else {
+            // 文字消息或快捷消息
+            if (!data.message || typeof data.message !== 'string') return;
+
+            const cleanMessage = data.message.trim().substring(0, 100);
+            if (!cleanMessage) return;
+
+            chatData.type = data.type === 'quick' ? 'quick' : 'text';
+            chatData.message = cleanMessage;
+
+            this.broadcastToRoom(roomId, 'gameChat', chatData);
+        }
     }
 
     /**
