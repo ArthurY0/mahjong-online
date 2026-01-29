@@ -682,6 +682,7 @@ const Game = {
      * 显示动作按钮
      */
     showActionButtons(data) {
+        console.log('showActionButtons called with:', data);
         const container = document.getElementById('action-buttons');
         container.classList.remove('hidden');
 
@@ -693,6 +694,7 @@ const Game = {
         // 显示可用的按钮
         data.actions.forEach(action => {
             const btn = document.getElementById(`btn-${action}`);
+            console.log(`Looking for btn-${action}:`, btn);
             if (btn) {
                 btn.classList.remove('hidden');
             }
@@ -754,13 +756,19 @@ const Game = {
      * 处理吃
      */
     handleChow(options) {
-        if (!options || options.length === 0) return;
+        console.log('handleChow called with options:', options);
+        if (!options || options.length === 0) {
+            console.log('No chow options available');
+            return;
+        }
 
         if (options.length === 1) {
             // 只有一种选择，直接吃
+            console.log('Single chow option, emitting chow event');
             socketHandler.emit('chow', { tiles: options[0] });
         } else {
             // 显示选择界面
+            console.log('Multiple chow options, showing selection');
             this.showChowOptions(options);
         }
         this.hideActionButtons();
@@ -805,6 +813,7 @@ const Game = {
      * 处理碰
      */
     handlePong() {
+        console.log('handlePong called, emitting pong event');
         socketHandler.emit('pong');
         this.hideActionButtons();
     },
@@ -813,6 +822,7 @@ const Game = {
      * 处理杠
      */
     handleKong() {
+        console.log('handleKong called, emitting kong event');
         socketHandler.emit('kong', { type: 'exposed' });
         this.hideActionButtons();
     },
@@ -821,6 +831,7 @@ const Game = {
      * 处理胡牌
      */
     handleMahjong() {
+        console.log('handleMahjong called, emitting hu event');
         socketHandler.emit('hu');
         this.hideActionButtons();
     },
@@ -829,6 +840,7 @@ const Game = {
      * 处理过牌
      */
     handlePass() {
+        console.log('handlePass called, emitting pass event');
         socketHandler.emit('pass');
         this.hideActionButtons();
     },

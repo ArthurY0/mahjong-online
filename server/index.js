@@ -267,20 +267,24 @@ io.on('connection', (socket) => {
 
     // 游戏操作 - 碰
     socket.on('pong', () => {
+        console.log('Received pong event from', socket.userId);
         if (gameManager) {
-            gameManager.handlePong(socket);
+            const result = gameManager.handlePong(socket);
+            console.log('handlePong result:', result);
         }
     });
 
     // 游戏操作 - 杠
     socket.on('kong', (data) => {
+        console.log('Received kong event from', socket.userId, 'data:', data);
         if (gameManager) {
-            gameManager.handleKong(socket, data.type);
+            gameManager.handleKong(socket, data.type, data.tile);
         }
     });
 
     // 游戏操作 - 吃
     socket.on('chow', (data) => {
+        console.log('Received chow event from', socket.userId, 'data:', data);
         if (gameManager) {
             gameManager.handleChow(socket, data.tiles);
         }
@@ -288,13 +292,15 @@ io.on('connection', (socket) => {
 
     // 游戏操作 - 胡
     socket.on('hu', () => {
+        console.log('Received hu event from', socket.userId);
         if (gameManager) {
-            gameManager.handleHu(socket);
+            gameManager.handleMahjong(socket);
         }
     });
 
     // 游戏操作 - 跳过
     socket.on('pass', () => {
+        console.log('Received pass event from', socket.userId);
         if (gameManager) {
             gameManager.handlePass(socket);
         }
