@@ -416,23 +416,41 @@ const Game = {
         // 渲染其他玩家
         this.renderOtherPlayers();
 
-        // 渲染中央弃牌区（所有玩家的弃牌）
+        // 渲染中央弃牌区（所有玩家的弃牌按顺序）
         this.renderCenterDiscards();
 
-        // 更新回合指示
+        // 更新回合指示和计时器
         this.updateTurnIndicator();
 
-        // 启动计时器
+        // 启动计时器（显示在当前玩家区域）
         if (state.currentPlayer === myIndex) {
             this.startTimer();
         } else {
             this.clearTimer();
-            // 显示当前玩家的剩余时间
-            const timerEl = document.getElementById('action-timer');
-            if (timerEl) {
-                timerEl.textContent = '--';
-                timerEl.className = 'action-timer';
+            this.clearAllTimerDisplays();
+        }
+    },
+
+    /**
+     * 清除所有玩家的计时器显示
+     */
+    clearAllTimerDisplays() {
+        // 清除其他玩家的计时器
+        ['top', 'left', 'right'].forEach(pos => {
+            const container = document.getElementById(`player-${pos}`);
+            if (container) {
+                const timerEl = container.querySelector('.player-timer');
+                if (timerEl) {
+                    timerEl.textContent = '';
+                    timerEl.className = 'player-timer';
+                }
             }
+        });
+        // 清除自己的计时器
+        const myTimer = document.getElementById('my-timer');
+        if (myTimer) {
+            myTimer.textContent = '';
+            myTimer.className = 'player-timer';
         }
     },
 
@@ -509,7 +527,7 @@ const Game = {
             // 计算相对位置
             let relativePos = (otherHand.index - state.myIndex + 4) % 4;
             const position = positions[relativePos];
-            
+
             const container = document.getElementById(`player-${position}`);
             if (!container || position === 'bottom') return;
 
@@ -517,7 +535,7 @@ const Game = {
             const playerInfo = container.querySelector('.player-info');
             if (playerInfo) {
                 playerInfo.querySelector('.player-name').textContent = otherHand.username;
-                playerInfo.querySelector('.player-score').textContent = 
+                playerInfo.querySelector('.player-score').textContent =
                     state.scores[state.players[otherHand.index].id];
             }
 
@@ -527,26 +545,16 @@ const Game = {
                 TileRenderer.renderOpponentHand(handContainer, otherHand.hand.tileCount);
             }
 
-            // 副露
+            // 副露（吃碰杠的牌）
             const meldsContainer = container.querySelector('.player-melds');
             if (meldsContainer) {
                 TileRenderer.renderMelds(meldsContainer, otherHand.hand.melds);
-            }
-
-            // 弃牌
-            const discardsContainer = container.querySelector('.player-discards');
-            if (discardsContainer) {
-                TileRenderer.renderDiscards(
-                    discardsContainer, 
-                    otherHand.hand.discards,
-                    state.lastDiscardedTile
-                );
             }
         });
     },
 
     /**
-     * 渲染中央弃牌区（所有玩家的最近弃牌）
+     * 渲染中央弃牌区（所有玩家的弃牌按出牌顺序显示）
      */
     renderCenterDiscards() {
         const state = this.gameState;
@@ -555,82 +563,89 @@ const Game = {
 
         container.innerHTML = '';
 
-        // 位置顺序：自己（底部）、右边、对面、左边
-        const positions = ['bottom', 'right', 'top', 'left'];
-        const positionLabels = ['我', '右', '对', '左'];
+        // 收集所有玩家的弃牌并按顺序合并
+        let allDiscards = [];
 
-        // 获取所有玩家的弃牌（包括自己）
+        // 获取所有玩家的弃牌
         for (let i = 0; i < 4; i++) {
             const playerIndex = (state.myIndex + i) % 4;
             const isMe = playerIndex === state.myIndex;
-            const isCurrentTurn = playerIndex === state.currentPlayer;
 
-            // 创建玩家弃牌区域
-            const areaDiv = document.createElement('div');
-            areaDiv.className = 'player-discard-area';
-
-            // 玩家标签
-            const labelDiv = document.createElement('div');
-            labelDiv.className = `player-discard-label ${isCurrentTurn ? 'current-turn' : ''}`;
-
-            // 获取玩家名
-            let playerName = '';
-            if (isMe) {
-                playerName = state.players[playerIndex]?.username || '我';
-            } else {
-                const otherHand = state.otherHands.find(h => h.index === playerIndex);
-                playerName = otherHand?.username || state.players[playerIndex]?.username || `玩家${i + 1}`;
-            }
-            labelDiv.textContent = playerName;
-            areaDiv.appendChild(labelDiv);
-
-            // 弃牌容器
-            const tilesDiv = document.createElement('div');
-            tilesDiv.className = 'discard-tiles';
-
-            // 获取弃牌列表
             let discards = [];
             if (isMe) {
-                // 自己的弃牌从 myHand 中获取
                 discards = state.myHand?.discards || [];
             } else {
-                // 其他玩家的弃牌
                 const otherHand = state.otherHands.find(h => h.index === playerIndex);
                 discards = otherHand?.hand?.discards || [];
             }
 
-            // 只显示最近6张弃牌
-            const recentDiscards = discards.slice(-6);
-            recentDiscards.forEach((tile, idx) => {
-                const isLast = state.lastDiscardedTile &&
-                               tile.id === state.lastDiscardedTile.id;
-                const elem = TileRenderer.createTileElement(tile, {
-                    small: true,
-                    className: isLast ? 'last-discard' : ''
+            // 添加弃牌到总列表，附带顺序信息
+            discards.forEach(tile => {
+                allDiscards.push({
+                    tile: tile,
+                    order: tile.discardOrder || tile.id // 使用出牌顺序或id
                 });
-                tilesDiv.appendChild(elem);
             });
+        }
 
-            areaDiv.appendChild(tilesDiv);
-            container.appendChild(areaDiv);
+        // 按出牌顺序排序
+        allDiscards.sort((a, b) => a.order - b.order);
+
+        // 渲染所有弃牌
+        allDiscards.forEach(item => {
+            const isLast = state.lastDiscardedTile &&
+                           item.tile.id === state.lastDiscardedTile.id;
+            const elem = TileRenderer.createTileElement(item.tile, {
+                small: true,
+                className: isLast ? 'last-discard' : ''
+            });
+            container.appendChild(elem);
+        });
+    },
+
+    /**
+     * 更新回合指示器（高亮当前玩家区域）
+     */
+    updateTurnIndicator() {
+        const state = this.gameState;
+        const positions = ['bottom', 'right', 'top', 'left'];
+        let relativePos = (state.currentPlayer - state.myIndex + 4) % 4;
+        const currentPosition = positions[relativePos];
+
+        // 移除所有玩家区域的当前回合标记
+        document.querySelectorAll('.player-area').forEach(area => {
+            area.classList.remove('current-turn');
+        });
+        document.querySelector('.my-hand-area')?.classList.remove('current-turn');
+
+        // 添加当前回合玩家的标记
+        if (currentPosition === 'bottom') {
+            document.querySelector('.my-hand-area')?.classList.add('current-turn');
+        } else {
+            const container = document.getElementById(`player-${currentPosition}`);
+            if (container) {
+                container.classList.add('current-turn');
+            }
         }
     },
 
     /**
-     * 更新回合指示器
+     * 获取当前回合玩家的计时器元素
      */
-    updateTurnIndicator() {
+    getCurrentPlayerTimerElement() {
         const state = this.gameState;
-        const indicator = document.getElementById('turn-indicator');
-        
-        const currentPlayer = state.players[state.currentPlayer];
-        indicator.textContent = `${currentPlayer.username}的回合`;
-        indicator.className = 'turn-indicator';
+        if (!state) return null;
 
-        // 根据位置调整
         const positions = ['bottom', 'right', 'top', 'left'];
         let relativePos = (state.currentPlayer - state.myIndex + 4) % 4;
-        indicator.classList.add(positions[relativePos]);
+        const currentPosition = positions[relativePos];
+
+        if (currentPosition === 'bottom') {
+            return document.getElementById('my-timer');
+        } else {
+            const container = document.getElementById(`player-${currentPosition}`);
+            return container?.querySelector('.player-timer');
+        }
     },
 
     /**
@@ -819,21 +834,21 @@ const Game = {
     },
 
     /**
-     * 启动计时器
+     * 启动计时器（显示在当前玩家区域）
      */
     startTimer() {
         this.clearTimer();
+        this.clearAllTimerDisplays();
 
         if (!this.gameState) return;
 
         let timeLeft = this.gameState.options?.timeLimit || 30;
-        const timerEl = document.getElementById('action-timer');
+        const timerEl = this.getCurrentPlayerTimerElement();
 
         if (!timerEl) return;
 
         timerEl.textContent = timeLeft;
-        timerEl.className = 'action-timer';
-        timerEl.classList.remove('hidden');
+        timerEl.className = 'player-timer active';
 
         this.timerInterval = setInterval(() => {
             timeLeft--;
@@ -883,19 +898,19 @@ const Game = {
     },
 
     /**
-     * 启动动作计时器（用于响应其他玩家的出牌）
+     * 启动动作计时器（用于响应其他玩家的出牌，显示在自己区域）
      */
     startActionTimer() {
         this.clearTimer();
+        this.clearAllTimerDisplays();
 
         let timeLeft = 10;
-        const timerEl = document.getElementById('action-timer');
+        const timerEl = document.getElementById('my-timer');
 
         if (!timerEl) return;
 
         timerEl.textContent = timeLeft;
-        timerEl.className = 'action-timer warning';
-        timerEl.classList.remove('hidden');
+        timerEl.className = 'player-timer active warning';
 
         this.timerInterval = setInterval(() => {
             timeLeft--;

@@ -197,55 +197,30 @@
     box-sizing: border-box;
 }
 
-/* 牌桌中央弃牌区 */
+/* 牌桌中央弃牌区 - 所有弃牌按顺序显示 */
 .center-discards {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
     padding: 15px;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 12px;
     margin: 10px 0;
-    min-width: 280px;
-    max-width: 400px;
-}
-
-.center-discards .player-discard-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-}
-
-.center-discards .player-discard-label {
-    font-size: 11px;
-    color: var(--text-secondary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 80px;
-}
-
-.center-discards .player-discard-label.current-turn {
-    color: var(--accent-color);
-    font-weight: bold;
-}
-
-.center-discards .discard-tiles {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2px;
+    min-width: 200px;
+    max-width: 320px;
     justify-content: center;
-    max-width: 80px;
+    align-content: flex-start;
+    max-height: 180px;
+    overflow-y: auto;
 }
 
-.center-discards .discard-tiles .tile {
-    width: 22px;
-    height: 30px;
-    font-size: 14px;
+.center-discards .tile {
+    width: 24px;
+    height: 33px;
+    font-size: 15px;
 }
 
-.center-discards .discard-tiles .tile.last-discard {
+.center-discards .tile.last-discard {
     box-shadow: 0 0 8px 2px var(--accent-color);
     animation: lastDiscardPulse 1s infinite;
 }
@@ -300,6 +275,48 @@
 
 .player-score {
     color: var(--accent-color);
+}
+
+/* 玩家计时器 */
+.player-timer {
+    font-weight: bold;
+    font-size: 14px;
+    min-width: 24px;
+    text-align: center;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: transparent;
+}
+
+.player-timer.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.player-timer.warning {
+    color: var(--warning-color);
+    background: rgba(255, 193, 7, 0.3);
+    animation: timerPulse 0.5s infinite;
+}
+
+.player-timer.danger {
+    color: var(--error-color);
+    background: rgba(244, 67, 54, 0.3);
+    animation: timerPulse 0.25s infinite;
+}
+
+@keyframes timerPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* 玩家副露区域 */
+.player-melds {
+    display: flex;
+    gap: 8px;
+    margin: 5px 0;
+    flex-wrap: wrap;
 }
 
 /* 游戏中间区域 */
@@ -617,21 +634,34 @@
 }
 
 /* 当前玩家指示 */
-.current-turn {
+.player-area.current-turn {
     position: relative;
 }
 
-.current-turn::before {
-    content: '▶';
-    position: absolute;
-    left: -20px;
-    color: var(--accent-color);
-    animation: arrowBlink 0.5s infinite;
+.player-area.current-turn .player-info {
+    background: rgba(255, 193, 7, 0.3);
+    border: 2px solid var(--accent-color);
 }
 
-@keyframes arrowBlink {
+.my-hand-area.current-turn {
+    position: relative;
+}
+
+.my-hand-area.current-turn::before {
+    content: '你的回合';
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent-color);
+    font-size: 12px;
+    font-weight: bold;
+    animation: turnBlink 1s infinite;
+}
+
+@keyframes turnBlink {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+    50% { opacity: 0.5; }
 }
 
 /* 响应式设计 */
@@ -715,38 +745,88 @@
 
     /* 中央弃牌区手机优化 */
     .center-discards {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
+        gap: 2px;
         padding: 8px;
-        min-width: 180px;
-        max-width: 240px;
+        min-width: 160px;
+        max-width: 220px;
+        max-height: 120px;
     }
 
-    .center-discards .player-discard-label {
-        font-size: 9px;
-        max-width: 60px;
-    }
-
-    .center-discards .discard-tiles {
-        max-width: 60px;
-    }
-
-    .center-discards .discard-tiles .tile {
+    .center-discards .tile {
         width: 18px;
-        height: 24px;
-        font-size: 11px;
+        height: 25px;
+        font-size: 12px;
     }
 
     .game-middle {
-        flex-direction: column;
-        padding: 0 10px;
+        flex-direction: row;
+        padding: 0 5px;
+        align-items: center;
     }
 
+    /* 左右玩家保持垂直布局，牌横向排列 */
     .player-left,
     .player-right {
-        width: 100%;
-        flex-direction: row;
+        width: 60px;
+        flex-direction: column;
         justify-content: center;
+        align-items: center;
+        padding: 5px;
+    }
+
+    .player-left .player-info,
+    .player-right .player-info {
+        min-width: auto;
+        padding: 3px 6px;
+        font-size: 10px;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .player-left .player-name,
+    .player-right .player-name {
+        font-size: 10px;
+    }
+
+    .player-left .player-score,
+    .player-right .player-score {
+        font-size: 9px;
+    }
+
+    .player-left .player-timer,
+    .player-right .player-timer {
+        font-size: 11px;
+    }
+
+    /* 左右玩家手牌横向显示 */
+    .player-left .hand-tiles,
+    .player-right .hand-tiles {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1px;
+        justify-content: center;
+    }
+
+    .player-left .tile,
+    .player-right .tile {
+        width: 16px;
+        height: 22px;
+        font-size: 10px;
+    }
+
+    /* 左右玩家副露 */
+    .player-left .player-melds,
+    .player-right .player-melds {
+        flex-direction: row;
+        gap: 3px;
+    }
+
+    .player-left .meld .tile,
+    .player-right .meld .tile {
+        width: 14px;
+        height: 20px;
+        font-size: 9px;
     }
 
     .my-hand {
@@ -757,9 +837,9 @@
     }
 
     .my-hand .tile {
-        width: 38px;
-        height: 53px;
-        font-size: 27px;
+        width: 32px;
+        height: 45px;
+        font-size: 22px;
     }
 
     .my-drawn-tile {
@@ -768,9 +848,9 @@
     }
 
     .my-drawn-tile .tile {
-        width: 38px;
-        height: 53px;
-        font-size: 27px;
+        width: 32px;
+        height: 45px;
+        font-size: 22px;
     }
 
     .player-bottom {
@@ -780,7 +860,7 @@
     }
 
     .action-buttons {
-        bottom: 140px;
+        bottom: 130px;
         flex-wrap: wrap;
         justify-content: center;
         gap: 8px;
@@ -789,47 +869,42 @@
     }
 
     .action-btn {
-        padding: 10px 14px;
-        font-size: 14px;
-    }
-
-    .player-discards {
-        max-width: 150px;
-    }
-
-    .player-discards .tile {
-        width: 22px;
-        height: 31px;
-        font-size: 15px;
-    }
-
-    .player-left .tile,
-    .player-right .tile {
-        width: 36px;
-        height: 25px;
-        font-size: 15px;
+        padding: 8px 12px;
+        font-size: 13px;
     }
 
     .center-info {
         flex-wrap: wrap;
         justify-content: center;
-        gap: 10px;
-        padding: 8px 12px;
+        gap: 8px;
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    #wind-indicator {
         font-size: 14px;
     }
 
     .player-info {
-        min-width: 100px;
-        padding: 5px 10px;
-        font-size: 13px;
+        min-width: 80px;
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+
+    .player-timer {
+        font-size: 12px;
     }
 
     .game-info-bar {
         left: 5px;
-        right: 5px;
+        right: auto;
         bottom: 5px;
-        padding: 8px 12px;
-        font-size: 13px;
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    #my-timer {
+        font-size: 12px;
     }
 
     /* 座位布局手机优化 */
@@ -882,53 +957,76 @@
 /* 超小屏幕手机 */
 @media (max-width: 480px) {
     .my-hand .tile {
-        width: 32px;
-        height: 45px;
-        font-size: 23px;
+        width: 28px;
+        height: 40px;
+        font-size: 19px;
     }
 
     .my-drawn-tile .tile {
-        width: 32px;
-        height: 45px;
-        font-size: 23px;
+        width: 28px;
+        height: 40px;
+        font-size: 19px;
     }
 
     .my-hand {
         gap: 1px;
-        padding: 5px;
+        padding: 4px;
     }
 
     .my-drawn-tile {
         margin-left: 5px;
-        padding: 5px;
+        padding: 4px;
     }
 
     .action-buttons {
-        bottom: 120px;
-        gap: 6px;
-        padding: 8px 10px;
+        bottom: 110px;
+        gap: 5px;
+        padding: 6px 8px;
     }
 
     .action-btn {
-        padding: 8px 12px;
-        font-size: 12px;
+        padding: 6px 10px;
+        font-size: 11px;
     }
 
-    .player-discards .tile {
-        width: 18px;
-        height: 26px;
-        font-size: 12px;
+    /* 中央弃牌区 */
+    .center-discards {
+        gap: 2px;
+        padding: 6px;
+        min-width: 140px;
+        max-width: 180px;
+        max-height: 100px;
     }
 
-    .player-discards {
-        max-width: 120px;
+    .center-discards .tile {
+        width: 15px;
+        height: 21px;
+        font-size: 10px;
+    }
+
+    /* 左右玩家 */
+    .player-left,
+    .player-right {
+        width: 50px;
+        padding: 3px;
     }
 
     .player-left .tile,
     .player-right .tile {
-        width: 30px;
-        height: 21px;
-        font-size: 12px;
+        width: 14px;
+        height: 20px;
+        font-size: 9px;
+    }
+
+    .player-left .player-info,
+    .player-right .player-info {
+        padding: 2px 4px;
+        font-size: 9px;
+    }
+
+    .player-left .player-name,
+    .player-right .player-name {
+        font-size: 9px;
     }
 
     .seat {
@@ -947,23 +1045,29 @@
     }
 
     .center-info {
+        font-size: 11px;
+        padding: 5px 8px;
+        gap: 6px;
+    }
+
+    #wind-indicator {
         font-size: 12px;
     }
 
     .player-info {
-        min-width: 80px;
-        font-size: 11px;
+        min-width: 60px;
+        font-size: 10px;
+        padding: 3px 6px;
     }
 
-    .turn-indicator {
-        padding: 6px 12px;
-        font-size: 12px;
+    .player-timer {
+        font-size: 10px;
+        padding: 1px 4px;
     }
 
-    .action-timer {
-        width: 70px;
-        height: 70px;
-        font-size: 26px;
+    .game-info-bar {
+        padding: 4px 8px;
+        font-size: 10px;
     }
 
     /* 模态框手机优化 */
@@ -1018,26 +1122,92 @@
         overflow: hidden;
     }
 
+    /* 游戏中间区域保持横向布局 */
+    .game-middle {
+        flex-direction: row;
+        padding: 0 3px;
+        align-items: center;
+    }
+
+    /* 左右玩家区域优化 */
+    .player-left,
+    .player-right {
+        width: 45px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 3px;
+    }
+
+    .player-left .player-info,
+    .player-right .player-info {
+        min-width: auto;
+        padding: 2px 4px;
+        font-size: 8px;
+        flex-direction: column;
+        gap: 1px;
+        margin-bottom: 3px;
+    }
+
+    .player-left .player-name,
+    .player-right .player-name {
+        font-size: 8px;
+    }
+
+    .player-left .player-score,
+    .player-right .player-score {
+        font-size: 8px;
+    }
+
+    .player-left .player-timer,
+    .player-right .player-timer {
+        font-size: 9px;
+        padding: 1px 3px;
+    }
+
+    /* 左右玩家手牌横向显示 */
+    .player-left .hand-tiles,
+    .player-right .hand-tiles {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1px;
+        justify-content: center;
+    }
+
+    .player-left .tile,
+    .player-right .tile {
+        width: 13px;
+        height: 18px;
+        font-size: 8px;
+    }
+
+    /* 左右玩家副露 */
+    .player-left .player-melds,
+    .player-right .player-melds {
+        flex-direction: row;
+        gap: 2px;
+        margin: 2px 0;
+    }
+
+    .player-left .meld .tile,
+    .player-right .meld .tile {
+        width: 12px;
+        height: 17px;
+        font-size: 7px;
+    }
+
     /* 中央弃牌区 iPhone优化 */
     .center-discards {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 4px;
-        padding: 6px;
-        min-width: 140px;
-        max-width: 200px;
+        gap: 2px;
+        padding: 5px;
+        min-width: 130px;
+        max-width: 180px;
+        max-height: 90px;
         margin: 5px 0;
     }
 
-    .center-discards .player-discard-label {
-        font-size: 8px;
-        max-width: 50px;
-    }
-
-    .center-discards .discard-tiles {
-        max-width: 50px;
-    }
-
-    .center-discards .discard-tiles .tile {
+    .center-discards .tile {
         width: 14px;
         height: 19px;
         font-size: 9px;
@@ -1046,8 +1216,8 @@
 
     /* 优化玩家底部区域 */
     .player-bottom {
-        padding: 8px 5px;
-        padding-bottom: calc(8px + env(safe-area-inset-bottom, 20px));
+        padding: 6px 5px;
+        padding-bottom: calc(6px + env(safe-area-inset-bottom, 15px));
         gap: 3px;
         position: relative;
         z-index: 10;
@@ -1056,158 +1226,121 @@
     /* 手牌优化 */
     .my-hand {
         gap: 1px;
-        padding: 4px 2px;
+        padding: 3px 2px;
         flex-wrap: nowrap;
         overflow-x: auto;
-        max-width: calc(100vw - 80px);
+        max-width: calc(100vw - 70px);
         justify-content: flex-start;
     }
 
     .my-hand .tile {
-        width: 28px;
-        height: 40px;
-        font-size: 20px;
+        width: 26px;
+        height: 37px;
+        font-size: 18px;
         flex-shrink: 0;
-        border-radius: 4px;
+        border-radius: 3px;
     }
 
     .my-drawn-tile {
-        margin-left: 6px;
-        padding: 4px;
+        margin-left: 5px;
+        padding: 3px;
         flex-shrink: 0;
     }
 
     .my-drawn-tile .tile {
-        width: 28px;
-        height: 40px;
-        font-size: 20px;
-        border-radius: 4px;
+        width: 26px;
+        height: 37px;
+        font-size: 18px;
+        border-radius: 3px;
     }
 
     /* 操作按钮优化 */
     .action-buttons {
-        bottom: calc(100px + env(safe-area-inset-bottom, 20px));
-        gap: 5px;
-        padding: 8px;
-        border-radius: 12px;
-        max-width: 90%;
+        bottom: calc(90px + env(safe-area-inset-bottom, 15px));
+        gap: 4px;
+        padding: 6px;
+        border-radius: 10px;
+        max-width: 92%;
     }
 
     .action-btn {
-        padding: 8px 10px;
-        font-size: 12px;
-        border-radius: 6px;
+        padding: 6px 8px;
+        font-size: 11px;
+        border-radius: 5px;
     }
 
     /* 中央信息区域 */
     .center-info {
-        padding: 6px 10px;
-        gap: 8px;
-        font-size: 11px;
-        border-radius: 8px;
+        padding: 5px 8px;
+        gap: 6px;
+        font-size: 10px;
+        border-radius: 6px;
     }
 
     #wind-indicator {
-        font-size: 14px;
+        font-size: 12px;
     }
 
-    /* 玩家信息 */
-    .player-info {
-        min-width: 70px;
-        padding: 4px 8px;
-        font-size: 10px;
-        border-radius: 12px;
+    /* 顶部玩家 */
+    .player-top .player-info {
+        min-width: 60px;
+        padding: 3px 6px;
+        font-size: 9px;
     }
 
-    .player-name {
-        font-size: 11px;
-    }
-
-    .player-score {
-        font-size: 11px;
-    }
-
-    /* 对手手牌 */
-    .player-top .tile,
-    .opponent-hand .tile {
-        width: 22px;
-        height: 32px;
-        font-size: 14px;
-    }
-
-    .player-left .tile,
-    .player-right .tile {
-        width: 28px;
-        height: 20px;
-        font-size: 11px;
-    }
-
-    /* 弃牌区 */
-    .player-discards {
-        max-width: 100px;
-        gap: 1px;
-    }
-
-    .player-discards .tile {
-        width: 16px;
-        height: 23px;
-        font-size: 11px;
+    .player-top .tile {
+        width: 18px;
+        height: 26px;
+        font-size: 12px;
     }
 
     /* 计时器 */
-    .action-timer {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-    }
-
-    /* 回合指示器 */
-    .turn-indicator {
-        padding: 5px 10px;
-        font-size: 11px;
-        border-radius: 15px;
-    }
-
-    .turn-indicator.bottom {
-        bottom: calc(110px + env(safe-area-inset-bottom, 20px));
+    .player-timer {
+        font-size: 9px;
+        padding: 1px 3px;
     }
 
     /* 游戏信息栏 */
     .game-info-bar {
-        bottom: env(safe-area-inset-bottom, 5px);
-        left: 5px;
+        bottom: env(safe-area-inset-bottom, 3px);
+        left: 3px;
         right: auto;
-        padding: 5px 10px;
-        font-size: 10px;
-        border-radius: 8px;
+        padding: 4px 8px;
+        font-size: 9px;
+        border-radius: 6px;
     }
 
-    /* 游戏中间区域 */
-    .game-middle {
-        padding: 0 5px;
+    #my-timer {
+        font-size: 10px;
     }
 
     .game-center {
-        padding: 10px 5px;
+        padding: 8px 3px;
     }
 
     /* 副露 */
     .meld {
         gap: 1px;
-        padding: 2px;
+        padding: 1px;
     }
 
     .meld .tile {
+        width: 18px;
+        height: 25px;
+        font-size: 11px;
+    }
+
+    /* 花牌 */
+    .my-flowers .tile {
         width: 20px;
         height: 28px;
         font-size: 13px;
     }
 
-    /* 花牌 */
-    .my-flowers .tile {
-        width: 22px;
-        height: 32px;
-        font-size: 15px;
+    /* 当前回合提示优化 */
+    .my-hand-area.current-turn::before {
+        font-size: 10px;
+        top: -20px;
     }
 }
 
