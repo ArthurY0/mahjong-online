@@ -258,14 +258,19 @@ class MahjongGame {
      * 通知有待处理动作
      */
     notifyPendingActions() {
+        console.log('notifyPendingActions called, pendingActions:', JSON.stringify(this.pendingActions, null, 2));
         this.pendingActions.forEach(action => {
             const player = this.players[action.playerIndex];
+            const data = {
+                tile: this.lastDiscardedTile.toJSON(),
+                actions: action.actions.map(a => a.type),
+                chowOptions: action.actions.find(a => a.type === 'chow')?.options
+            };
+            console.log('Sending actionRequired to player', player.id, ':', data);
             if (player.socket) {
-                player.socket.emit('actionRequired', {
-                    tile: this.lastDiscardedTile.toJSON(),
-                    actions: action.actions.map(a => a.type),
-                    chowOptions: action.actions.find(a => a.type === 'chow')?.options
-                });
+                player.socket.emit('actionRequired', data);
+            } else {
+                console.log('Player socket not available for', player.id);
             }
         });
     }
@@ -300,10 +305,16 @@ class MahjongGame {
      * 处理碰
      */
     handlePong(playerId) {
+        console.log('handlePong called for player:', playerId);
+        console.log('Current pendingActions:', JSON.stringify(this.pendingActions, null, 2));
+
         const playerIndex = this.players.findIndex(p => p.id === playerId);
         const action = this.pendingActions.find(a => a.playerId === playerId);
-        
+
+        console.log('Found action for player:', action);
+
         if (!action || !action.actions.some(a => a.type === 'pong')) {
+            console.log('Cannot pong - action not found or pong not available');
             return { success: false, error: '不能碰' };
         }
 
@@ -474,10 +485,16 @@ class MahjongGame {
      * 处理吃
      */
     handleChow(playerId, selectedTiles) {
+        console.log('handleChow called for player:', playerId, 'with tiles:', selectedTiles);
+        console.log('Current pendingActions:', JSON.stringify(this.pendingActions, null, 2));
+
         const playerIndex = this.players.findIndex(p => p.id === playerId);
         const action = this.pendingActions.find(a => a.playerId === playerId);
-        
+
+        console.log('Found action for player:', action);
+
         if (!action || !action.actions.some(a => a.type === 'chow')) {
+            console.log('Cannot chow - action not found or chow not available');
             return { success: false, error: '不能吃' };
         }
 

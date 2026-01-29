@@ -35,20 +35,24 @@ const Game = {
      */
     setupSocketListeners() {
         socketHandler.on('gameState', (state) => {
+            console.log('Received gameState:', state);
             this.gameState = state;
             this.renderGame();
         });
 
         socketHandler.on('actionRequired', (data) => {
+            console.log('Received actionRequired:', data);
             this.pendingActions = data;
             this.showActionButtons(data);
         });
 
         socketHandler.on('canMahjong', (data) => {
+            console.log('Received canMahjong:', data);
             this.showMahjongButton();
         });
 
         socketHandler.on('canKong', (data) => {
+            console.log('Received canKong:', data);
             this.showKongButton(data);
         });
 
@@ -61,6 +65,7 @@ const Game = {
         });
 
         socketHandler.on('error', (data) => {
+            console.log('Received error:', data);
             Utils.showToast(data.message, 'error');
         });
 
