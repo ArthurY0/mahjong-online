@@ -636,202 +636,9 @@
 
 /* 响应式设计 */
 
-/* 平板设备 */
-@media (max-width: 1200px) {
-    .my-hand .tile {
-        width: 52px;
-        height: 73px;
-        font-size: 36px;
-    }
+/* ===== 非游戏元素的响应式（座位、房间、大厅等） ===== */
 
-    .my-drawn-tile .tile {
-        width: 52px;
-        height: 73px;
-        font-size: 36px;
-    }
-
-    .player-discards {
-        max-width: 200px;
-    }
-
-    .player-discards .tile {
-        width: 26px;
-        height: 36px;
-        font-size: 18px;
-    }
-}
-
-/* 手机横屏和小平板 */
-@media (max-width: 900px) {
-    .my-hand .tile {
-        width: 45px;
-        height: 63px;
-        font-size: 32px;
-    }
-
-    .my-drawn-tile .tile {
-        width: 45px;
-        height: 63px;
-        font-size: 32px;
-    }
-
-    .my-hand {
-        gap: 2px;
-        padding: 8px;
-    }
-
-    .my-drawn-tile {
-        margin-left: 10px;
-        padding: 8px;
-    }
-
-    .action-buttons {
-        bottom: 180px;
-        padding: 10px 15px;
-    }
-
-    .action-btn {
-        padding: 10px 18px;
-        font-size: 16px;
-    }
-
-    .player-info {
-        min-width: 120px;
-        padding: 6px 12px;
-    }
-
-    .center-info {
-        padding: 8px 15px;
-        gap: 15px;
-    }
-}
-
-/* 手机竖屏 */
 @media (max-width: 768px) {
-    .game-container {
-        grid-template-rows: auto 1fr auto;
-        transform-origin: top left;
-    }
-
-    /* 中央弃牌区手机优化 */
-    .center-discards {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-        padding: 8px;
-        min-width: 180px;
-        max-width: 240px;
-    }
-
-    .center-discards .player-discard-label {
-        font-size: 9px;
-        max-width: 60px;
-    }
-
-    .center-discards .discard-tiles {
-        max-width: 60px;
-    }
-
-    .center-discards .discard-tiles .tile {
-        width: 18px;
-        height: 24px;
-        font-size: 11px;
-    }
-
-    .game-middle {
-        flex-direction: column;
-        padding: 0 10px;
-    }
-
-    .player-left,
-    .player-right {
-        width: 100%;
-        flex-direction: row;
-        justify-content: center;
-    }
-
-    .my-hand {
-        gap: 1px;
-        padding: 6px;
-        flex-wrap: wrap;
-        max-width: 100%;
-    }
-
-    .my-hand .tile {
-        width: 38px;
-        height: 53px;
-        font-size: 27px;
-    }
-
-    .my-drawn-tile {
-        margin-left: 8px;
-        padding: 6px;
-    }
-
-    .my-drawn-tile .tile {
-        width: 38px;
-        height: 53px;
-        font-size: 27px;
-    }
-
-    .player-bottom {
-        padding: 10px;
-        gap: 5px;
-        flex-wrap: wrap;
-    }
-
-    .action-buttons {
-        bottom: 140px;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 8px;
-        padding: 10px 12px;
-        max-width: 95%;
-    }
-
-    .action-btn {
-        padding: 10px 14px;
-        font-size: 14px;
-    }
-
-    .player-discards {
-        max-width: 150px;
-    }
-
-    .player-discards .tile {
-        width: 22px;
-        height: 31px;
-        font-size: 15px;
-    }
-
-    .player-left .tile,
-    .player-right .tile {
-        width: 36px;
-        height: 25px;
-        font-size: 15px;
-    }
-
-    .center-info {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-        padding: 8px 12px;
-        font-size: 14px;
-    }
-
-    .player-info {
-        min-width: 100px;
-        padding: 5px 10px;
-        font-size: 13px;
-    }
-
-    .game-info-bar {
-        left: 5px;
-        right: 5px;
-        bottom: 5px;
-        padding: 8px 12px;
-        font-size: 13px;
-    }
-
     /* 座位布局手机优化 */
     .seats-container {
         gap: 15px;
@@ -879,58 +686,7 @@
     }
 }
 
-/* 超小屏幕手机 */
 @media (max-width: 480px) {
-    .my-hand .tile {
-        width: 32px;
-        height: 45px;
-        font-size: 23px;
-    }
-
-    .my-drawn-tile .tile {
-        width: 32px;
-        height: 45px;
-        font-size: 23px;
-    }
-
-    .my-hand {
-        gap: 1px;
-        padding: 5px;
-    }
-
-    .my-drawn-tile {
-        margin-left: 5px;
-        padding: 5px;
-    }
-
-    .action-buttons {
-        bottom: 120px;
-        gap: 6px;
-        padding: 8px 10px;
-    }
-
-    .action-btn {
-        padding: 8px 12px;
-        font-size: 12px;
-    }
-
-    .player-discards .tile {
-        width: 18px;
-        height: 26px;
-        font-size: 12px;
-    }
-
-    .player-discards {
-        max-width: 120px;
-    }
-
-    .player-left .tile,
-    .player-right .tile {
-        width: 30px;
-        height: 21px;
-        font-size: 12px;
-    }
-
     .seat {
         width: 80px;
         height: 80px;
@@ -944,26 +700,6 @@
         width: 55px;
         height: 55px;
         font-size: 16px;
-    }
-
-    .center-info {
-        font-size: 12px;
-    }
-
-    .player-info {
-        min-width: 80px;
-        font-size: 11px;
-    }
-
-    .turn-indicator {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
-
-    .action-timer {
-        width: 70px;
-        height: 70px;
-        font-size: 26px;
     }
 
     /* 模态框手机优化 */
@@ -1007,191 +743,256 @@
     }
 }
 
-/* iPhone 14/15 优化 (390x844) */
-@media (max-width: 430px) and (min-height: 800px) {
-    /* 游戏容器使用安全区域 */
-    .game-container {
-        padding-top: env(safe-area-inset-top, 0);
-        padding-bottom: env(safe-area-inset-bottom, 0);
-        height: 100vh;
-        height: 100dvh; /* 动态视口高度 */
-        overflow: hidden;
-    }
+/* ===== 横屏提示遮罩 ===== */
 
-    /* 中央弃牌区 iPhone优化 */
-    .center-discards {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 4px;
-        padding: 6px;
-        min-width: 140px;
-        max-width: 200px;
-        margin: 5px 0;
-    }
+.landscape-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.92);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
 
-    .center-discards .player-discard-label {
-        font-size: 8px;
-        max-width: 50px;
-    }
+.landscape-overlay.hidden {
+    display: none;
+}
 
-    .center-discards .discard-tiles {
-        max-width: 50px;
-    }
+.landscape-overlay-content {
+    text-align: center;
+    color: white;
+}
 
-    .center-discards .discard-tiles .tile {
-        width: 14px;
-        height: 19px;
-        font-size: 9px;
-        border-radius: 2px;
-    }
+.rotate-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    animation: rotateHint 2s ease-in-out infinite;
+}
 
-    /* 优化玩家底部区域 */
-    .player-bottom {
-        padding: 8px 5px;
-        padding-bottom: calc(8px + env(safe-area-inset-bottom, 20px));
-        gap: 3px;
-        position: relative;
-        z-index: 10;
-    }
+@keyframes rotateHint {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(90deg); }
+}
 
-    /* 手牌优化 */
-    .my-hand {
-        gap: 1px;
-        padding: 4px 2px;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        max-width: calc(100vw - 80px);
-        justify-content: flex-start;
-    }
+.landscape-overlay-text {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
 
+.landscape-overlay-subtext {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* ===== 平板横屏 ===== */
+@media (max-width: 1200px) and (orientation: landscape) {
     .my-hand .tile {
-        width: 28px;
-        height: 40px;
-        font-size: 20px;
-        flex-shrink: 0;
-        border-radius: 4px;
-    }
-
-    .my-drawn-tile {
-        margin-left: 6px;
-        padding: 4px;
-        flex-shrink: 0;
+        width: 52px;
+        height: 73px;
+        font-size: 36px;
     }
 
     .my-drawn-tile .tile {
-        width: 28px;
-        height: 40px;
-        font-size: 20px;
-        border-radius: 4px;
+        width: 52px;
+        height: 73px;
+        font-size: 36px;
     }
 
-    /* 操作按钮优化 */
-    .action-buttons {
-        bottom: calc(100px + env(safe-area-inset-bottom, 20px));
-        gap: 5px;
-        padding: 8px;
-        border-radius: 12px;
-        max-width: 90%;
+    .player-discards {
+        max-width: 200px;
     }
 
-    .action-btn {
-        padding: 8px 10px;
-        font-size: 12px;
-        border-radius: 6px;
+    .player-discards .tile {
+        width: 26px;
+        height: 36px;
+        font-size: 18px;
+    }
+}
+
+/* ===== 手机横屏主模式 (height 320-500px) ===== */
+@media (orientation: landscape) and (max-height: 500px) {
+    /* 游戏容器：填满视口 */
+    .game-container {
+        min-height: 100vh;
+        min-height: 100dvh;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+        grid-template-rows: auto 1fr auto;
+        padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
     }
 
-    /* 中央信息区域 */
-    .center-info {
-        padding: 6px 10px;
-        gap: 8px;
+    /* 顶部玩家：隐藏手牌，仅显示信息+副露+弃牌 */
+    .player-top {
+        padding: 4px 10px;
+        gap: 2px;
+    }
+
+    .player-top .player-hand {
+        display: none;
+    }
+
+    .player-top .player-info {
+        min-width: 100px;
+        padding: 3px 10px;
         font-size: 11px;
-        border-radius: 8px;
+        margin-bottom: 2px;
+    }
+
+    .player-top .player-discards {
+        max-width: 180px;
+        padding: 3px;
+    }
+
+    .player-top .player-discards .tile {
+        width: 18px;
+        height: 25px;
+        font-size: 13px;
+    }
+
+    .player-top .player-melds .meld {
+        gap: 1px;
+        padding: 2px;
+    }
+
+    .player-top .player-melds .meld .tile {
+        width: 18px;
+        height: 25px;
+        font-size: 13px;
+    }
+
+    /* 左右玩家：隐藏手牌，收窄到60px */
+    .player-left,
+    .player-right {
+        width: 60px;
+        padding: 4px;
+    }
+
+    .player-left .player-hand,
+    .player-right .player-hand {
+        display: none;
+    }
+
+    .player-left .player-info,
+    .player-right .player-info {
+        min-width: auto;
+        padding: 3px 6px;
+        font-size: 9px;
+        flex-direction: column;
+        gap: 2px;
+        margin-bottom: 4px;
+    }
+
+    .player-left .player-discards,
+    .player-right .player-discards {
+        max-width: 55px;
+        padding: 2px;
+    }
+
+    .player-left .player-discards .tile,
+    .player-right .player-discards .tile {
+        width: 16px;
+        height: 22px;
+        font-size: 11px;
+    }
+
+    .player-left .player-melds .meld .tile,
+    .player-right .player-melds .meld .tile {
+        width: 16px;
+        height: 22px;
+        font-size: 11px;
+    }
+
+    /* 游戏中间区域 */
+    .game-middle {
+        padding: 0 4px;
+    }
+
+    /* 游戏中央 */
+    .game-center {
+        padding: 8px 10px;
+    }
+
+    .center-info {
+        padding: 5px 10px;
+        gap: 10px;
+        font-size: 12px;
+        margin-bottom: 8px;
     }
 
     #wind-indicator {
         font-size: 14px;
     }
 
-    /* 玩家信息 */
-    .player-info {
-        min-width: 70px;
-        padding: 4px 8px;
-        font-size: 10px;
-        border-radius: 12px;
+    /* 中央弃牌区 */
+    .center-discards {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        padding: 8px;
+        min-width: 200px;
+        max-width: 320px;
     }
 
-    .player-name {
-        font-size: 11px;
+    .center-discards .player-discard-label {
+        font-size: 9px;
+        max-width: 65px;
     }
 
-    .player-score {
-        font-size: 11px;
+    .center-discards .discard-tiles {
+        max-width: 65px;
     }
 
-    /* 对手手牌 */
-    .player-top .tile,
-    .opponent-hand .tile {
-        width: 22px;
-        height: 32px;
-        font-size: 14px;
-    }
-
-    .player-left .tile,
-    .player-right .tile {
-        width: 28px;
-        height: 20px;
-        font-size: 11px;
-    }
-
-    /* 弃牌区 */
-    .player-discards {
-        max-width: 100px;
-        gap: 1px;
-    }
-
-    .player-discards .tile {
+    .center-discards .discard-tiles .tile {
         width: 16px;
-        height: 23px;
-        font-size: 11px;
-    }
-
-    /* 计时器 */
-    .action-timer {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-    }
-
-    /* 回合指示器 */
-    .turn-indicator {
-        padding: 5px 10px;
-        font-size: 11px;
-        border-radius: 15px;
-    }
-
-    .turn-indicator.bottom {
-        bottom: calc(110px + env(safe-area-inset-bottom, 20px));
-    }
-
-    /* 游戏信息栏 */
-    .game-info-bar {
-        bottom: env(safe-area-inset-bottom, 5px);
-        left: 5px;
-        right: auto;
-        padding: 5px 10px;
+        height: 22px;
         font-size: 10px;
-        border-radius: 8px;
     }
 
-    /* 游戏中间区域 */
-    .game-middle {
-        padding: 0 5px;
+    /* 底部玩家（自己） */
+    .player-bottom {
+        padding: 6px 10px;
+        gap: 6px;
     }
 
-    .game-center {
-        padding: 10px 5px;
+    .my-hand {
+        gap: 2px;
+        padding: 6px;
+        flex-wrap: nowrap;
     }
 
-    /* 副露 */
+    .my-hand .tile {
+        width: 36px;
+        height: 50px;
+        font-size: 26px;
+        flex-shrink: 0;
+    }
+
+    .my-hand .tile:hover {
+        transform: translateY(-8px);
+    }
+
+    .my-drawn-tile {
+        margin-left: 8px;
+        padding: 6px;
+    }
+
+    .my-drawn-tile .tile {
+        width: 36px;
+        height: 50px;
+        font-size: 26px;
+        flex-shrink: 0;
+    }
+
+    .my-melds {
+        gap: 8px;
+        margin-bottom: 4px;
+    }
+
     .meld {
         gap: 1px;
         padding: 2px;
@@ -1203,11 +1004,265 @@
         font-size: 13px;
     }
 
+    /* 动作按钮：右侧垂直排列 */
+    .action-buttons {
+        position: fixed;
+        bottom: auto;
+        left: auto;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px;
+        border-radius: 10px;
+    }
+
+    .action-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    /* 计时器 */
+    .action-timer {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        border-width: 2px;
+        margin-top: 5px;
+    }
+
+    /* 回合指示器 */
+    .turn-indicator {
+        padding: 4px 10px;
+        font-size: 11px;
+    }
+
+    .turn-indicator.bottom {
+        bottom: 80px;
+    }
+
+    /* 游戏信息栏 */
+    .game-info-bar {
+        left: 5px;
+        bottom: 5px;
+        padding: 4px 10px;
+        font-size: 10px;
+        border-radius: 6px;
+    }
+
     /* 花牌 */
     .my-flowers .tile {
-        width: 22px;
+        width: 24px;
+        height: 34px;
+        font-size: 17px;
+    }
+
+    /* 聊天按钮 */
+    .game-chat-toggle {
+        top: 8px;
+        right: 8px;
+        bottom: auto;
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    /* 聊天面板 */
+    .game-chat-panel {
+        top: 50px;
+        right: 8px;
+        bottom: auto;
+        width: 240px;
+    }
+
+    .game-chat-messages {
+        height: 100px;
+    }
+
+    .game-chat-message {
+        font-size: 10px;
+        padding: 4px 6px;
+    }
+
+    .game-chat-input-area input {
+        font-size: 10px;
+        padding: 5px 8px;
+    }
+
+    .game-chat-send-btn,
+    .game-chat-voice-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+
+    .quick-msg-btn {
+        font-size: 9px;
+        padding: 2px 5px;
+    }
+
+    .game-chat-header h4 {
+        font-size: 12px;
+    }
+
+    .game-chat-quick {
+        padding: 4px;
+        gap: 3px;
+    }
+
+    .player-info {
+        min-width: 90px;
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+}
+
+/* ===== 超矮手机横屏 (<380px height) ===== */
+@media (orientation: landscape) and (max-height: 380px) {
+    .player-top {
+        padding: 2px 8px;
+    }
+
+    .player-top .player-info {
+        padding: 2px 8px;
+        font-size: 9px;
+    }
+
+    .player-top .player-discards .tile {
+        width: 16px;
+        height: 22px;
+        font-size: 11px;
+    }
+
+    .player-top .player-melds .meld .tile {
+        width: 16px;
+        height: 22px;
+        font-size: 11px;
+    }
+
+    .player-left,
+    .player-right {
+        width: 45px;
+        padding: 2px;
+    }
+
+    .player-left .player-info,
+    .player-right .player-info {
+        font-size: 8px;
+        padding: 2px 4px;
+    }
+
+    .player-left .player-discards .tile,
+    .player-right .player-discards .tile {
+        width: 14px;
+        height: 19px;
+        font-size: 9px;
+    }
+
+    .player-left .player-melds .meld .tile,
+    .player-right .player-melds .meld .tile {
+        width: 14px;
+        height: 19px;
+        font-size: 9px;
+    }
+
+    .player-bottom {
+        padding: 4px 8px;
+        gap: 4px;
+    }
+
+    .my-hand {
+        gap: 1px;
+        padding: 4px;
+    }
+
+    .my-hand .tile {
+        width: 30px;
+        height: 42px;
+        font-size: 22px;
+    }
+
+    .my-hand .tile:hover {
+        transform: translateY(-5px);
+    }
+
+    .my-drawn-tile {
+        margin-left: 6px;
+        padding: 4px;
+    }
+
+    .my-drawn-tile .tile {
+        width: 30px;
+        height: 42px;
+        font-size: 22px;
+    }
+
+    .my-melds {
+        gap: 5px;
+        margin-bottom: 2px;
+    }
+
+    .meld .tile {
+        width: 17px;
+        height: 24px;
+        font-size: 11px;
+    }
+
+    .center-discards {
+        gap: 4px;
+        padding: 6px;
+        min-width: 180px;
+        max-width: 280px;
+    }
+
+    .center-discards .discard-tiles .tile {
+        width: 14px;
+        height: 19px;
+        font-size: 9px;
+    }
+
+    .center-discards .player-discard-label {
+        font-size: 8px;
+    }
+
+    .center-info {
+        padding: 3px 8px;
+        gap: 8px;
+        font-size: 10px;
+        margin-bottom: 4px;
+    }
+
+    #wind-indicator {
+        font-size: 12px;
+    }
+
+    .action-timer {
+        width: 32px;
         height: 32px;
-        font-size: 15px;
+        font-size: 14px;
+    }
+
+    .action-btn {
+        padding: 6px 10px;
+        font-size: 10px;
+    }
+
+    .game-info-bar {
+        padding: 3px 8px;
+        font-size: 9px;
+    }
+
+    .my-flowers .tile {
+        width: 20px;
+        height: 28px;
+        font-size: 14px;
+    }
+
+    .game-chat-toggle {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
     }
 }
 
@@ -1436,44 +1491,3 @@
     background: rgba(255, 255, 255, 0.2);
 }
 
-/* iPhone 14 聊天优化 */
-@media (max-width: 430px) and (min-height: 800px) {
-    .game-chat-toggle {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-        bottom: calc(150px + env(safe-area-inset-bottom, 20px));
-    }
-
-    .game-chat-panel {
-        width: 260px;
-        bottom: calc(195px + env(safe-area-inset-bottom, 20px));
-        right: 5px;
-    }
-
-    .game-chat-messages {
-        height: 120px;
-    }
-
-    .game-chat-message {
-        font-size: 11px;
-        padding: 5px 7px;
-    }
-
-    .game-chat-input-area input {
-        font-size: 11px;
-        padding: 6px 10px;
-    }
-
-    .game-chat-send-btn,
-    .game-chat-voice-btn {
-        width: 32px;
-        height: 32px;
-        font-size: 12px;
-    }
-
-    .quick-msg-btn {
-        font-size: 9px;
-        padding: 3px 6px;
-    }
-}

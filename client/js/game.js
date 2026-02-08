@@ -521,12 +521,6 @@ const Game = {
                     state.scores[state.players[otherHand.index].id];
             }
 
-            // 手牌背面
-            const handContainer = container.querySelector('.hand-tiles');
-            if (handContainer) {
-                TileRenderer.renderOpponentHand(handContainer, otherHand.hand.tileCount);
-            }
-
             // 副露
             const meldsContainer = container.querySelector('.player-melds');
             if (meldsContainer) {
@@ -1042,6 +1036,7 @@ const Game = {
      */
     cleanup() {
         this.clearTimer();
+        OrientationManager.leaveGameScreen();
         this.gameState = null;
         this.selectedTile = null;
         this.pendingActions = null;

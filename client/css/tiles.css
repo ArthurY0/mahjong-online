@@ -313,8 +313,8 @@
 
 /* 响应式牌大小 */
 
-/* 平板设备 */
-@media (max-width: 1200px) {
+/* 平板横屏 */
+@media (max-width: 1200px) and (orientation: landscape) {
     .tile {
         width: 46px;
         height: 64px;
@@ -338,38 +338,103 @@
     }
 }
 
-/* 手机横屏 */
-@media (max-width: 900px) {
+/* 手机横屏主模式 */
+@media (orientation: landscape) and (max-height: 500px) {
     .tile {
-        width: 42px;
-        height: 59px;
-        font-size: 30px;
-        border-radius: 6px;
+        width: 36px;
+        height: 50px;
+        font-size: 26px;
+        border-radius: 5px;
     }
 
     .tile-small {
-        width: 28px;
-        height: 40px;
-        font-size: 20px;
+        width: 24px;
+        height: 34px;
+        font-size: 17px;
     }
 
     .tile-horizontal {
-        width: 59px;
-        height: 42px;
+        width: 50px;
+        height: 36px;
     }
 
     .tile-back::after {
-        font-size: 25px;
+        font-size: 22px;
+    }
+
+    .tile:hover {
+        transform: translateY(-5px);
     }
 
     .chow-option .tile {
-        width: 42px;
-        height: 59px;
+        width: 36px;
+        height: 50px;
+    }
+
+    .chow-options {
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .chow-option {
+        gap: 3px;
+        padding: 8px;
+    }
+
+    .my-flowers .tile {
+        width: 24px;
+        height: 34px;
+        font-size: 17px;
+    }
+
+    .meld {
+        gap: 1px;
+        padding: 3px;
     }
 }
 
-/* 手机竖屏 */
-@media (max-width: 768px) {
+/* 超矮手机横屏 */
+@media (orientation: landscape) and (max-height: 380px) {
+    .tile {
+        width: 30px;
+        height: 42px;
+        font-size: 22px;
+        border-radius: 4px;
+    }
+
+    .tile-small {
+        width: 20px;
+        height: 28px;
+        font-size: 14px;
+    }
+
+    .tile-horizontal {
+        width: 42px;
+        height: 30px;
+    }
+
+    .tile-back::after {
+        font-size: 18px;
+    }
+
+    .tile:hover {
+        transform: translateY(-3px);
+    }
+
+    .chow-option .tile {
+        width: 30px;
+        height: 42px;
+    }
+
+    .my-flowers .tile {
+        width: 20px;
+        height: 28px;
+        font-size: 14px;
+    }
+}
+
+/* 竖屏回退（用于非游戏场景：吃牌模态框、回放等） */
+@media (max-width: 768px) and (orientation: portrait) {
     .tile {
         width: 36px;
         height: 50px;
@@ -411,20 +476,13 @@
         padding: 8px;
     }
 
-    .my-flowers .tile {
-        width: 32px;
-        height: 45px;
-        font-size: 21px;
-    }
-
     .meld {
         gap: 1px;
         padding: 4px;
     }
 }
 
-/* 超小屏幕手机 */
-@media (max-width: 480px) {
+@media (max-width: 480px) and (orientation: portrait) {
     .tile {
         width: 30px;
         height: 42px;

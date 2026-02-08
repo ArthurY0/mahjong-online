@@ -46,10 +46,20 @@ const Utils = {
      * 切换屏幕
      */
     switchScreen(screenId) {
+        const previousScreen = document.querySelector('.screen.active');
+        const previousId = previousScreen ? previousScreen.id : null;
+
         document.querySelectorAll('.screen').forEach(screen => {
             screen.classList.remove('active');
         });
         document.getElementById(screenId).classList.add('active');
+
+        // 进入游戏界面时锁定横屏
+        if (screenId === 'game-screen') {
+            OrientationManager.enterGameScreen();
+        } else if (previousId === 'game-screen') {
+            OrientationManager.leaveGameScreen();
+        }
     },
 
     /**
@@ -158,5 +168,100 @@ window.onerror = function(message, source, lineno, colno, error) {
     Utils.showToast('发生错误，请刷新页面', 'error');
 };
 
+/**
+ * 屏幕方向管理器 - 游戏界面横屏锁定
+ */
+const OrientationManager = {
+    _locked: false,
+    _resizeHandler: null,
+
+    async lockLandscape() {
+        if (screen.orientation && screen.orientation.lock) {
+            try {
+                await screen.orientation.lock('landscape');
+                this._locked = true;
+                return true;
+            } catch (e) {
+                // 大多数浏览器不允许非全屏模式下锁定方向
+                return false;
+            }
+        }
+        return false;
+    },
+
+    unlockOrientation() {
+        if (this._locked && screen.orientation && screen.orientation.unlock) {
+            try {
+                screen.orientation.unlock();
+            } catch (e) {
+                // ignore
+            }
+            this._locked = false;
+        }
+        this.stopOrientationWatch();
+        this.hideOverlay();
+    },
+
+    isMobile() {
+        return /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+            || (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
+    },
+
+    isPortrait() {
+        return window.innerHeight > window.innerWidth;
+    },
+
+    showOverlay() {
+        const overlay = document.getElementById('landscape-overlay');
+        if (overlay) overlay.classList.remove('hidden');
+    },
+
+    hideOverlay() {
+        const overlay = document.getElementById('landscape-overlay');
+        if (overlay) overlay.classList.add('hidden');
+    },
+
+    _checkOrientation() {
+        if (!this.isMobile()) {
+            this.hideOverlay();
+            return;
+        }
+        if (this.isPortrait()) {
+            this.showOverlay();
+        } else {
+            this.hideOverlay();
+        }
+    },
+
+    startOrientationWatch() {
+        this._resizeHandler = () => this._checkOrientation();
+        window.addEventListener('resize', this._resizeHandler);
+        window.addEventListener('orientationchange', this._resizeHandler);
+        // Check immediately
+        this._checkOrientation();
+    },
+
+    stopOrientationWatch() {
+        if (this._resizeHandler) {
+            window.removeEventListener('resize', this._resizeHandler);
+            window.removeEventListener('orientationchange', this._resizeHandler);
+            this._resizeHandler = null;
+        }
+    },
+
+    async enterGameScreen() {
+        const locked = await this.lockLandscape();
+        if (!locked) {
+            // API lock failed, use overlay fallback
+            this.startOrientationWatch();
+        }
+    },
+
+    leaveGameScreen() {
+        this.unlockOrientation();
+    }
+};
+
 // 导出
 window.Utils = Utils;
+window.OrientationManager = OrientationManager;
