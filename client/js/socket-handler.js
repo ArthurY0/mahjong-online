@@ -82,21 +82,24 @@ class SocketHandler {
     }
 
     /**
-     * 监听事件
+     * 监听事件（支持同一事件多次注册，off 时全部移除）
      */
     on(event, handler) {
         if (this.socket) {
             this.socket.on(event, handler);
-            this.eventHandlers[event] = handler;
+            if (!this.eventHandlers[event]) {
+                this.eventHandlers[event] = [];
+            }
+            this.eventHandlers[event].push(handler);
         }
     }
 
     /**
-     * 移除事件监听
+     * 移除事件监听（移除该事件的所有 handler）
      */
     off(event) {
         if (this.socket && this.eventHandlers[event]) {
-            this.socket.off(event, this.eventHandlers[event]);
+            this.eventHandlers[event].forEach(h => this.socket.off(event, h));
             delete this.eventHandlers[event];
         }
     }

@@ -264,7 +264,8 @@ class MahjongGame {
                 player.socket.emit('actionRequired', {
                     tile: this.lastDiscardedTile.toJSON(),
                     actions: action.actions.map(a => a.type),
-                    chowOptions: action.actions.find(a => a.type === 'chow')?.options
+                    chowOptions: action.actions.find(a => a.type === 'chow')?.options,
+                    timeLimit: this.options.timeLimit
                 });
             }
         });
@@ -287,10 +288,11 @@ class MahjongGame {
      * 处理动作超时
      */
     handleActionTimeout() {
-        // 所有未响应的玩家视为过牌
-        this.pendingActions.forEach(action => {
+        // 复制数组快照，防止 handlePass 内部 clearPendingActions 清空后迭代失效
+        const snapshot = [...this.pendingActions];
+        snapshot.forEach(action => {
             const player = this.players[action.playerIndex];
-            if (!action.responded) {
+            if (!action.responded && this.pendingActions.includes(action)) {
                 this.handlePass(player.id);
             }
         });
@@ -305,6 +307,16 @@ class MahjongGame {
         
         if (!action || !action.actions.some(a => a.type === 'pong')) {
             return { success: false, error: '不能碰' };
+        }
+
+        // 若有未响应的胡牌玩家（优先级更高），先排队等待
+        const hasUnrespondedMahjong = this.pendingActions.some(a =>
+            !a.responded && a.playerId !== playerId && a.actions.some(act => act.priority > 2)
+        );
+        if (hasUnrespondedMahjong) {
+            action.responded = true;
+            action.chosenAction = { type: 'pong' };
+            return { success: true, waiting: true };
         }
 
         const hand = this.hands[playerId];
@@ -423,6 +435,10 @@ class MahjongGame {
                 hand.drawnTile = null;
             }
 
+            if (!addedTile) {
+                return { success: false, error: '加杠失败' };
+            }
+
             // 更新副露
             hand.melds[meldIndex].type = 'kong';
             hand.melds[meldIndex].tiles.push(addedTile);
@@ -442,11 +458,25 @@ class MahjongGame {
                 return { success: false, error: '不能杠' };
             }
 
+            // 若有未响应的胡牌玩家（优先级更高），先排队等待
+            const hasUnrespondedMahjong = this.pendingActions.some(a =>
+                !a.responded && a.playerId !== playerId && a.actions.some(act => act.priority > 2)
+            );
+            if (hasUnrespondedMahjong) {
+                action.responded = true;
+                action.chosenAction = { type: 'kong' };
+                return { success: true, waiting: true };
+            }
+
             const tile = this.lastDiscardedTile;
             const tiles = [tile];
             for (let i = 0; i < 3; i++) {
                 const removed = hand.removeTile(tile);
                 if (removed) tiles.push(removed);
+            }
+
+            if (tiles.length !== 4) {
+                return { success: false, error: '明杠失败' };
             }
 
             hand.addMeld(new Meld('kong', tiles, false, this.lastDiscardPlayer));
@@ -620,14 +650,18 @@ class MahjongGame {
      * 处理过牌
      */
     handlePass(playerId) {
+        if (this.state === GameState.FINISHED) {
+            return { success: true };
+        }
+
         const action = this.pendingActions.find(a => a.playerId === playerId);
         if (action) {
             action.responded = true;
             action.chosenAction = null;
         }
 
-        // 检查是否所有人都响应了
-        const allResponded = this.pendingActions.every(a => a.responded);
+        // 检查是否所有人都响应了（需非空，空数组 every 永远返回 true 会误触发 nextTurn）
+        const allResponded = this.pendingActions.length > 0 && this.pendingActions.every(a => a.responded);
         
         if (allResponded) {
             // 处理最高优先级的动作
@@ -650,6 +684,10 @@ class MahjongGame {
                 const { chosenAction, playerId } = highestAction;
                 if (chosenAction.type === 'chow') {
                     this.handleChow(playerId, chosenAction.tiles);
+                } else if (chosenAction.type === 'pong') {
+                    this.handlePong(playerId);
+                } else if (chosenAction.type === 'kong') {
+                    this.handleKong(playerId, 'exposed');
                 }
             } else {
                 // 没有人行动，进入下一回合

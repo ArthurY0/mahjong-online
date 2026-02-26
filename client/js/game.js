@@ -687,8 +687,8 @@ const Game = {
         document.getElementById('btn-mahjong').onclick = () => this.handleMahjong();
         document.getElementById('btn-pass').onclick = () => this.handlePass();
 
-        // 启动动作计时器
-        this.startActionTimer();
+        // 启动动作计时器（使用服务端下发的时限）
+        this.startActionTimer(data.timeLimit);
     },
 
     /**
@@ -716,7 +716,7 @@ const Game = {
         document.getElementById('btn-pass').classList.remove('hidden');
 
         document.getElementById('btn-kong').onclick = () => {
-            socketHandler.emit('declareKong', { type: data.type, tile: data.tile || data.tiles[0] });
+            socketHandler.emit('kong', { type: data.type, tile: data.tile || data.tiles[0] });
             this.hideActionButtons();
         };
     },
@@ -737,7 +737,7 @@ const Game = {
 
         if (options.length === 1) {
             // 只有一种选择，直接吃
-            socketHandler.emit('declareChow', { tiles: options[0] });
+            socketHandler.emit('chow', { tiles: options[0] });
         } else {
             // 显示选择界面
             this.showChowOptions(options);
@@ -765,7 +765,7 @@ const Game = {
 
             optionDiv.addEventListener('click', () => {
                 const tiles = option.map(v => ({ type: tile.type, value: v }));
-                socketHandler.emit('declareChow', { tiles });
+                socketHandler.emit('chow', { tiles });
                 Utils.hideModal('chow-modal');
             });
 
@@ -784,7 +784,7 @@ const Game = {
      * 处理碰
      */
     handlePong() {
-        socketHandler.emit('declarePong');
+        socketHandler.emit('pong');
         this.hideActionButtons();
     },
 
@@ -792,7 +792,7 @@ const Game = {
      * 处理杠
      */
     handleKong() {
-        socketHandler.emit('declareKong', { type: 'exposed' });
+        socketHandler.emit('kong', { type: 'exposed' });
         this.hideActionButtons();
     },
 
@@ -800,7 +800,7 @@ const Game = {
      * 处理胡牌
      */
     handleMahjong() {
-        socketHandler.emit('declareMahjong');
+        socketHandler.emit('hu');
         this.hideActionButtons();
     },
 
@@ -879,10 +879,10 @@ const Game = {
     /**
      * 启动动作计时器（用于响应其他玩家的出牌）
      */
-    startActionTimer() {
+    startActionTimer(timeLimit) {
         this.clearTimer();
 
-        let timeLeft = 10;
+        let timeLeft = timeLimit || 30;
         const timerEl = document.getElementById('action-timer');
 
         if (!timerEl) return;

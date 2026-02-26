@@ -11,6 +11,7 @@ class DatabaseManager {
     constructor() {
         this.dbPath = path.join(__dirname, '../../data/mahjong.db');
         this.db = null;
+        this._saveTimer = null;
         this.ready = this.init();
     }
 
@@ -93,6 +94,19 @@ class DatabaseManager {
     }
 
     /**
+     * 防抖保存：合并短时间内的多次写操作，避免每次写都阻塞事件循环
+     */
+    scheduleSave() {
+        if (this._saveTimer) {
+            clearTimeout(this._saveTimer);
+        }
+        this._saveTimer = setTimeout(() => {
+            this._saveTimer = null;
+            this.save();
+        }, 1000);
+    }
+
+    /**
      * 保存数据库到文件
      */
     save() {
@@ -145,8 +159,8 @@ class DatabaseManager {
     run(sql, params = []) {
         try {
             this.db.run(sql, params);
-            this.save();
-            return { 
+            this.scheduleSave();
+            return {
                 lastInsertRowid: this.db.exec("SELECT last_insert_rowid()")[0]?.values[0][0],
                 changes: this.db.getRowsModified()
             };
@@ -315,12 +329,16 @@ class DatabaseManager {
      * 获取用户游戏记录
      */
     getUserGameRecords(userId, limit = 20) {
+        // 整数 ID 在 JSON 中无引号（"id":1,），字符串 ID 有引号（"id":"guest_x",）
+        const idPattern = typeof userId === 'number'
+            ? `%"id":${userId},%`
+            : `%"id":"${userId}",%`;
         const records = this.all(`
             SELECT * FROM game_records
             WHERE players LIKE ?
             ORDER BY created_at DESC
             LIMIT ?
-        `, [`%"${userId}"%`, limit]);
+        `, [idPattern, limit]);
         
         return records.map(r => ({
             ...r,
@@ -354,6 +372,9 @@ class DatabaseManager {
      * 获取用户的回放列表
      */
     getUserReplays(userId, limit = 20) {
+        const idPattern = typeof userId === 'number'
+            ? `%"id":${userId},%`
+            : `%"id":"${userId}",%`;
         const replays = this.all(`
             SELECT r.game_id, r.created_at, g.players, g.winner_id, g.rule_set
             FROM replays r
@@ -361,7 +382,7 @@ class DatabaseManager {
             WHERE g.players LIKE ?
             ORDER BY r.created_at DESC
             LIMIT ?
-        `, [`%"${userId}"%`, limit]);
+        `, [idPattern, limit]);
         
         return replays.map(r => ({
             ...r,

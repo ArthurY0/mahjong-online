@@ -7,6 +7,7 @@ const DatabaseManager = require('./database/Database');
 const LobbyManager = require('./lobby/LobbyManager');
 const RoomManager = require('./lobby/RoomManager');
 const GameManager = require('./game/GameManager');
+const ReplayManager = require('./replay/ReplayManager');
 
 const app = express();
 const server = http.createServer(app);
@@ -32,7 +33,8 @@ let lobbyManager, roomManager, gameManager;
 
 // 等待数据库初始化后再创建管理器
 dbManager.ready.then(() => {
-    gameManager = new GameManager(io, dbManager, null);
+    const replayManager = new ReplayManager(dbManager);
+    gameManager = new GameManager(io, dbManager, replayManager);
     roomManager = new RoomManager(io, gameManager);
     lobbyManager = new LobbyManager(io, roomManager, dbManager);
     console.log('管理器初始化完成');

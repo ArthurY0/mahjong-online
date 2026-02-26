@@ -84,6 +84,7 @@ class GameManager {
         if (!result.success) {
             socket.emit('error', { message: result.error });
         }
+        this._cleanupIfFinished(game);
     }
 
     /**
@@ -116,6 +117,7 @@ class GameManager {
         if (!result.success) {
             socket.emit('error', { message: result.error });
         }
+        this._cleanupIfFinished(game);
     }
 
     /**
@@ -152,6 +154,8 @@ class GameManager {
             this.saveGameReplay(game);
             // 更新玩家统计
             this.updatePlayerStats(game);
+            // 清理游戏实例，防止内存泄漏
+            this.endGame(game.gameId);
         }
     }
 
@@ -166,6 +170,7 @@ class GameManager {
         }
 
         game.handlePass(socket.userId);
+        this._cleanupIfFinished(game);
     }
 
     /**
@@ -203,17 +208,30 @@ class GameManager {
      */
     updatePlayerStats(game) {
         const log = game.getGameLog();
-        
+
+        // 从 game log 中找到胡牌记录，确定唯一胜者
+        const mahjongEntry = log.log.find(entry => entry.type === 'mahjong');
+        const winnerIndex = mahjongEntry ? mahjongEntry.data.player : -1;
+        const winnerId = winnerIndex >= 0 ? game.players[winnerIndex]?.id : null;
+
         game.players.forEach(player => {
             if (!player.isGuest) {
-                const isWinner = log.finalScores[player.id] > 0;
                 this.db.updateUserStats(player.id, {
                     gamesPlayed: 1,
-                    wins: isWinner ? 1 : 0,
+                    wins: player.id === winnerId ? 1 : 0,
                     score: log.finalScores[player.id]
                 });
             }
         });
+    }
+
+    /**
+     * 若游戏已结束（流局等），清理实例
+     */
+    _cleanupIfFinished(game) {
+        if (game.state === GameState.FINISHED) {
+            this.endGame(game.gameId);
+        }
     }
 
     /**

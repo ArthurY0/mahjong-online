@@ -11,6 +11,20 @@ class RoomManager {
         this.gameManager = gameManager;
         this.rooms = new Map(); // roomId -> room info
         this.playerRooms = new Map(); // playerId -> roomId
+        this.chatCooldowns = new Map(); // userId -> lastMessageTime
+    }
+
+    /**
+     * 检查聊天频率限制，返回 false 表示被限流
+     */
+    _checkChatRateLimit(userId, cooldownMs) {
+        const now = Date.now();
+        const lastTime = this.chatCooldowns.get(userId) || 0;
+        if (now - lastTime < cooldownMs) {
+            return false;
+        }
+        this.chatCooldowns.set(userId, now);
+        return true;
     }
 
     /**
@@ -155,6 +169,7 @@ class RoomManager {
         }
 
         this.playerRooms.delete(socket.userId);
+        this.chatCooldowns.delete(socket.userId);
         socket.leave(`room:${roomId}`);
         socket.currentRoom = null;
 
@@ -191,6 +206,10 @@ class RoomManager {
             return;
         }
 
+        if (!this._checkChatRateLimit(socket.userId, 500)) {
+            return;
+        }
+
         const roomId = this.playerRooms.get(socket.userId);
         if (!roomId) return;
 
@@ -212,6 +231,12 @@ class RoomManager {
     handleGameChat(socket, data) {
         // 验证输入
         if (!data) return;
+
+        // 语音消息（最大 1.5MB）冷却 3 秒，文字消息冷却 500ms
+        const cooldownMs = data.type === 'voice' ? 3000 : 500;
+        if (!this._checkChatRateLimit(socket.userId, cooldownMs)) {
+            return;
+        }
 
         const roomId = this.playerRooms.get(socket.userId);
         if (!roomId) return;
