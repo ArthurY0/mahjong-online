@@ -252,12 +252,17 @@ const Game = {
         messageDiv.className = `game-chat-message ${isMe ? 'mine' : ''} ${data.type === 'quick' ? 'quick' : ''}`;
 
         if (data.type === 'voice') {
-            messageDiv.innerHTML = `
-                <span class="chat-sender">${this.escapeHtml(data.username)}</span>
-                <span class="chat-voice" onclick="Game.playVoiceFromUrl('${data.audioUrl}')">
-                    🔊 语音消息 (${data.duration || '?'}s)
-                </span>
-            `;
+            const senderSpan = document.createElement('span');
+            senderSpan.className = 'chat-sender';
+            senderSpan.textContent = data.username;
+
+            const voiceSpan = document.createElement('span');
+            voiceSpan.className = 'chat-voice';
+            voiceSpan.textContent = `🔊 语音消息 (${data.duration || '?'}s)`;
+            voiceSpan.addEventListener('click', () => Game.playVoiceFromUrl(data.audioUrl));
+
+            messageDiv.appendChild(senderSpan);
+            messageDiv.appendChild(voiceSpan);
         } else {
             messageDiv.innerHTML = `
                 <span class="chat-sender">${this.escapeHtml(data.username)}</span>
@@ -957,7 +962,8 @@ const Game = {
                 <h4>分数</h4>
                 <div class="score-list">
                     ${data.hands.map(h => {
-                        const score = data.scores[this.gameState.players[h.index].id];
+                        const player = data.players && data.players[h.index];
+                        const score = player ? data.scores[player.id] : 0;
                         const isWinner = h.index === data.winner.index;
                         return `
                             <div class="score-item ${isWinner ? 'winner' : ''}">

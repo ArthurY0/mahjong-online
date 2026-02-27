@@ -45,6 +45,7 @@ class RoomManager {
                 id: socket.userId,
                 username: socket.username,
                 socket: socket,
+                isGuest: socket.isGuest || false,
                 ready: false,
                 seatIndex: 0
             }],
@@ -119,6 +120,7 @@ class RoomManager {
             id: socket.userId,
             username: socket.username,
             socket: socket,
+            isGuest: socket.isGuest || false,
             ready: false,
             seatIndex
         });
@@ -363,7 +365,8 @@ class RoomManager {
             .map(p => ({
                 id: p.id,
                 username: p.username,
-                socket: p.socket
+                socket: p.socket,
+                isGuest: p.isGuest || false
             }));
 
         const game = this.gameManager.createGame(roomId, gamePlayers, room.options);

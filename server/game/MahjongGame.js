@@ -141,23 +141,24 @@ class MahjongGame {
      */
     drawFromDeadWall(playerIndex) {
         const player = this.players[playerIndex];
-        const tile = this.tileWall.drawFromDeadWall();
-        
+        let tile = this.tileWall.drawFromDeadWall();
+
+        // 迭代处理花牌，避免无界递归
+        while (tile && tile.isFlowerTile()) {
+            this.hands[player.id].addFlower(tile);
+            tile = this.tileWall.drawFromDeadWall();
+        }
+
         if (!tile) {
             this.handleDraw();
             return null;
         }
 
-        if (tile.isFlowerTile()) {
-            this.hands[player.id].addFlower(tile);
-            return this.drawFromDeadWall(playerIndex);
-        }
-
         this.hands[player.id].setDrawnTile(tile);
         this.logAction('drawDeadWall', { player: playerIndex, tile: tile.toJSON() });
-        
+
         this.checkSelfDrawWin(playerIndex, tile);
-        
+
         return tile;
     }
 
@@ -666,14 +667,14 @@ class MahjongGame {
         if (allResponded) {
             // 处理最高优先级的动作
             let highestAction = null;
-            this.pendingActions.forEach(action => {
-                if (action.chosenAction) {
-                    if (!highestAction || 
-                        action.actions.find(a => a.type === action.chosenAction.type)?.priority >
+            this.pendingActions.forEach(pendingAction => {
+                if (pendingAction.chosenAction) {
+                    if (!highestAction ||
+                        pendingAction.actions.find(a => a.type === pendingAction.chosenAction.type)?.priority >
                         highestAction.priority) {
                         highestAction = {
-                            ...action,
-                            priority: action.actions.find(a => a.type === action.chosenAction.type)?.priority
+                            ...pendingAction,
+                            priority: pendingAction.actions.find(a => a.type === pendingAction.chosenAction.type)?.priority
                         };
                     }
                 }
@@ -854,6 +855,7 @@ class MahjongGame {
             result,
             isSelfDraw,
             scores: this.scores,
+            players: this.players.map((p, i) => ({ index: i, id: p.id, username: p.username })),
             hands: this.players.map((p, i) => ({
                 index: i,
                 username: p.username,

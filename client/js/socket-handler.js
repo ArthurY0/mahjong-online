@@ -17,7 +17,15 @@ class SocketHandler {
     connect() {
         return new Promise((resolve, reject) => {
             const serverUrl = window.location.origin;
-            
+            let settled = false;
+
+            const settle = (fn, value) => {
+                if (!settled) {
+                    settled = true;
+                    fn(value);
+                }
+            };
+
             this.socket = io(serverUrl, {
                 transports: ['websocket', 'polling'],
                 reconnection: true,
@@ -29,14 +37,14 @@ class SocketHandler {
                 console.log('已连接到服务器');
                 this.connected = true;
                 this.reconnectAttempts = 0;
-                resolve();
+                settle(resolve, undefined);
             });
 
             this.socket.on('connect_error', (error) => {
                 console.error('连接错误:', error);
                 this.reconnectAttempts++;
                 if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-                    reject(new Error('无法连接到服务器'));
+                    settle(reject, new Error('无法连接到服务器'));
                 }
             });
 
@@ -63,9 +71,7 @@ class SocketHandler {
 
             // 设置超时
             setTimeout(() => {
-                if (!this.connected) {
-                    reject(new Error('连接超时'));
-                }
+                settle(reject, new Error('连接超时'));
             }, 10000);
         });
     }

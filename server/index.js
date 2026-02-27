@@ -170,7 +170,8 @@ io.on('connection', (socket) => {
 
     // 游客登录
     socket.on('guestLogin', (data) => {
-        const nickname = data.nickname || '游客' + Math.floor(Math.random() * 10000);
+        const rawNickname = (data && typeof data.nickname === 'string') ? data.nickname.trim() : '';
+        const nickname = rawNickname.substring(0, 20) || '游客' + Math.floor(Math.random() * 10000);
         socket.userId = 'guest_' + socket.id;
         socket.username = nickname;
         socket.isGuest = true;
@@ -262,7 +263,7 @@ io.on('connection', (socket) => {
 
     // 游戏操作 - 打牌
     socket.on('discardTile', (data) => {
-        if (gameManager) {
+        if (gameManager && data && data.tile) {
             gameManager.handleDiscardTile(socket, data.tile);
         }
     });
@@ -276,14 +277,14 @@ io.on('connection', (socket) => {
 
     // 游戏操作 - 杠
     socket.on('kong', (data) => {
-        if (gameManager) {
-            gameManager.handleKong(socket, data.type);
+        if (gameManager && data && data.type) {
+            gameManager.handleKong(socket, data.type, data.tile || null);
         }
     });
 
     // 游戏操作 - 吃
     socket.on('chow', (data) => {
-        if (gameManager) {
+        if (gameManager && data && Array.isArray(data.tiles)) {
             gameManager.handleChow(socket, data.tiles);
         }
     });
@@ -291,7 +292,7 @@ io.on('connection', (socket) => {
     // 游戏操作 - 胡
     socket.on('hu', () => {
         if (gameManager) {
-            gameManager.handleHu(socket);
+            gameManager.handleMahjong(socket);
         }
     });
 

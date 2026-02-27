@@ -150,12 +150,7 @@ class GameManager {
         if (!result.success) {
             socket.emit('error', { message: result.error });
         } else {
-            // 保存回放
-            this.saveGameReplay(game);
-            // 更新玩家统计
-            this.updatePlayerStats(game);
-            // 清理游戏实例，防止内存泄漏
-            this.endGame(game.gameId);
+            this._cleanupIfFinished(game);
         }
     }
 
@@ -226,10 +221,12 @@ class GameManager {
     }
 
     /**
-     * 若游戏已结束（流局等），清理实例
+     * 若游戏已结束（胡牌或流局），保存回放、更新统计并清理实例
      */
     _cleanupIfFinished(game) {
-        if (game.state === GameState.FINISHED) {
+        if (game.state === GameState.FINISHED && this.games.has(game.gameId)) {
+            this.saveGameReplay(game);
+            this.updatePlayerStats(game);
             this.endGame(game.gameId);
         }
     }

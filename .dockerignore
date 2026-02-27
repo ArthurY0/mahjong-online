@@ -1,7 +1,37 @@
 node_modules
 npm-debug.log
+
+# Git
 .git
 .gitignore
+
+# 环境与密钥
 .env
-*.md
+.env.*
+!.env.example
+
+# 开发工具
+.claude/
+CLAUDE.md
+nul
+
+# 测试文件
+tests/
+test-results/
+playwright-report/
+playwright.config.js
+server/**/*.test.js
+
+# Docker 自身配置
+docker/
+Dockerfile
+docker-compose.yml
+
+# 数据文件（由 volume 挂载）
 data/*.db
+
+# 文档
+*.md
+
+# 项目副本（mahjong-online/ 是冗余的子目录）
+mahjong-online/
